@@ -1,0 +1,27 @@
+[project]
+name = "sql_pilot"
+version = "0.1.0"
+description = "sql_pilot using crewAI"
+authors = [{ name = "Your Name", email = "you@example.com" }]
+requires-python = ">=3.10,<3.14"
+dependencies = [
+    "crewai[tools]==1.6.1",
+    "litellm>=1.80.10",
+    "pydantic>=2.12.5",
+    "supabase>=2.27.0",
+]
+
+[project.scripts]
+sql_pilot = "sql_pilot.main:run"
+run_crew = "sql_pilot.main:run"
+train = "sql_pilot.main:train"
+replay = "sql_pilot.main:replay"
+test = "sql_pilot.main:test"
+run_with_trigger = "sql_pilot.main:run_with_trigger"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.crewai]
+type = "crew"

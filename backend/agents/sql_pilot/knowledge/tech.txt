@@ -1,0 +1,49 @@
+Context:
+This document defines a semantic knowledge map used to classify technologies, tools, and 
+keywords under high-level categories. This knowledge source serves as a reference for 
+grouping different surface-level keywords under a single conceptual category, enabling 
+semantic-based searching rather than naive string matching. All terms are case-insensitive, 
+aliases are normalized, and the presence of any term implies relevance to the corresponding 
+category. Category labels act as conceptual umbrellas, not literal keyword requirements.
+
+FRONTEND:
+html, css, javascript, typescript, react, react.js, reactjs, next.js, nextjs, vue, vue.js, angular, angularjs, svelte, sveltekit, jquery, bootstrap, tailwind, tailwindcss, material-ui, mui, chakra-ui, shadcn, webpack, vite, parcel, babel, frontend, client-side, ui, ux, web-ui, browser, dom
+
+BACKEND:
+node, node.js, nodejs, express, express.js, nest, nestjs, fastify, django, flask, fastapi, spring, spring boot, asp.net, asp.net core, laravel, ruby on rails, rails, phoenix, actix, gin, fiber, backend, server-side, api, rest, graphql, grpc, microservices, monolith
+
+DATABASE:
+mysql, postgresql, postgres, sqlite, oracle, sqlserver, mongodb, mongo, redis, cassandra, dynamodb, firestore, couchdb, neo4j, arangodb, elasticsearch, opensearch, database, db, nosql, sql, rdbms, key-value, document-db, graph-db
+
+DEVOPS:
+docker, kubernetes, k8s, helm, terraform, ansible, jenkins, github-actions, gitlab-ci, circleci, argo, argo-cd, flux, devops, ci, cd, ci/cd, infrastructure, infrastructure-as-code, iac, monitoring, logging, prometheus, grafana, loki, elk, observability
+
+CLOUD:
+aws, amazon web services, ec2, s3, lambda, rds, dynamodb, gcp, google cloud, firebase, cloud functions, azure, azure devops, cloud, serverless, paas, iaas, saas
+
+MOBILE:
+android, ios, kotlin, swift, react native, flutter, dart, expo, xamarin, mobile, mobile-app, hybrid-app, native-app
+
+BLOCKCHAIN:
+blockchain, ethereum, solidity, web3, web3.js, ethers.js, hardhat, truffle, ganache, polygon, binance smart chain, smart-contract, defi, nft
+
+DATA_SCIENCE:
+python, pandas, numpy, scipy, matplotlib, seaborn, jupyter, data-science, data-analysis, statistics, analytics
+
+MACHINE_LEARNING:
+machine-learning, ml, scikit-learn, sklearn, tensorflow, keras, pytorch, xgboost, lightgbm, catboost, model-training, inference, supervised-learning, unsupervised-learning
+
+AI_NLP:
+nlp, natural language processing, llm, large language model, transformers, huggingface, bert, gpt, llama, embedding, semantic-search, text-generation
+
+SYSTEMS:
+operating-systems, linux, unix, kernel, threads, concurrency, parallelism, memory-management, file-systems, networking, sockets
+
+SECURITY:
+security, cybersecurity, authentication, authorization, oauth, oauth2, jwt, sso, encryption, hashing, ssl, tls, penetration-testing
+
+TESTING:
+testing, unit-testing, integration-testing, e2e, jest, mocha, chai, pytest, junit, selenium, playwright, cypress
+
+TOOLS:
+git, github, gitlab, bitbucket, vscode, intellij, pycharm, postman, insomnia, cli, terminal, shell, bash, zsh

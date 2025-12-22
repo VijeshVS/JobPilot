@@ -1,0 +1,9 @@
+sql_query_task:
+  description: >
+    Analyze the user's request, determine whether a SQL query or RPC call
+    is required, construct the exact query or parameters using the available
+    tools, and execute the operation without assumptions or guesses.
+    User request: {user_query}
+  expected_output: >
+    List of candidates
+  agent: sql_expert
