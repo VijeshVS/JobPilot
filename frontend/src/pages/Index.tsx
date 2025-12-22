@@ -1,98 +1,115 @@
-import { useState } from "react";
-import { SearchPrompt } from "@/components/SearchPrompt";
-import { CandidateGrid } from "@/components/CandidateGrid";
-import { AILoadingOverlay } from "@/components/AILoadingOverlay";
-import { mockCandidates } from "@/data/mockCandidates";
-import { Candidate } from "@/types/candidate";
-import { useToast } from "@/hooks/use-toast";
-import { Plane, Sparkles } from "lucide-react";
+import { useState } from 'react';
+import { Plane } from 'lucide-react';
+import { SearchPrompt } from '@/components/SearchPrompt';
+import { CandidateGrid } from '@/components/CandidateGrid';
+import { AILoadingOverlay } from '@/components/AILoadingOverlay';
+import { Candidate } from '@/types/candidate';
+import { mockCandidates } from '@/data/mockCandidates';
+import { useSSEEvents } from '@/hooks/useSSEEvents';
+import { useToast } from '@/hooks/use-toast';
 
 const Index = () => {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const { events, isConnected, isComplete, connect, disconnect } = useSSEEvents();
   const { toast } = useToast();
+
+  const fetchCandidates = async (prompt: string) => {
+    try {
+      const response = await fetch('http://localhost:8000/complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ "input": prompt })
+      });
+
+      const data = await response.json();
+      console.log(data);
+      const results = JSON.parse(data.result).candidates;
+      console.log(results);
+      setCandidates(results);
+      setIsLoading(false);
+      
+      toast({
+        title: "Candidates Found",
+        description: `Found ${results.length} matching candidates`,
+      });
+    } catch (error) {
+      console.error('Error fetching candidates:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch candidates",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSearch = async (prompt: string) => {
     setIsLoading(true);
     setHasSearched(true);
+    setCandidates([]);
+    
+    // Connect to SSE and fetch candidates concurrently
+    connect(prompt);
+    fetchCandidates(prompt);
+  };
 
-    const response = await fetch('http://localhost:8000/complete', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ "input": prompt })
-    });
-
-    const data = await response.json();
-
-    console.log(data)
-    const results = JSON.parse(data.result).candidates;
-    console.log(results)
-    setCandidates(results);
+  const handleCancel = () => {
+    disconnect();
     setIsLoading(false);
-
-    toast({
-      title: "Search complete",
-      description: `Found ${results.length} matching candidates`,
-    });
   };
 
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b border-border/50 bg-card/50 backdrop-blur-sm sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4">
+      <header className="border-b border-border/50 bg-card/30 backdrop-blur-sm sticky top-0 z-50">
+        <div className="container mx-auto px-6 py-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg gradient-primary flex items-center justify-center shadow-sm">
+            <div className="w-10 h-10 rounded-xl bg-gradient-primary flex items-center justify-center">
               <Plane className="w-5 h-5 text-primary-foreground" />
             </div>
             <div>
               <h1 className="text-xl font-bold text-foreground">Job Pilot</h1>
-              <p className="text-sm text-muted-foreground">AI-Powered Candidate Search</p>
+              <p className="text-xs text-muted-foreground">AI-Powered Candidate Search</p>
             </div>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-12">
-        {/* Hero Section */}
-        <section className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
-            <Sparkles className="w-4 h-4" />
-            Smart Candidate Matching
+      <main className="container mx-auto px-6 py-12">
+        {/* Search Section */}
+        <div className="max-w-3xl mx-auto mb-12">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-foreground mb-3">
+              Find Your Perfect Candidates
+            </h2>
+            <p className="text-muted-foreground">
+              Describe the ideal candidate and let our AI agents search through the talent pool
+            </p>
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4 tracking-tight">
-            Find Your Perfect Candidate
-          </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-10">
-            Describe the skills, experience, and qualities you're looking for. 
-            Our AI will match you with the best candidates instantly.
-          </p>
-
+          
           <SearchPrompt onSearch={handleSearch} isLoading={isLoading} />
-        </section>
+        </div>
+
+        {/* Loading Overlay */}
+        {isLoading && (
+          <div className="mb-12">
+            <AILoadingOverlay 
+              events={events} 
+              isConnected={isConnected}
+              onCancel={handleCancel}
+            />
+          </div>
+        )}
 
         {/* Results Section */}
-        {hasSearched && (
-          <section className="mt-16">
-            {isLoading ? (
-              <AILoadingOverlay isLoading={isLoading} />
-            ) : (
-              <CandidateGrid candidates={candidates} isLoading={false} />
-            )}
-          </section>
+        {!isLoading && hasSearched && (
+          <CandidateGrid candidates={candidates} isLoading={false} />
         )}
       </main>
-
-      {/* Footer */}
-      <footer className="border-t border-border/50 mt-auto">
-        <div className="container mx-auto px-4 py-6">
-          <p className="text-center text-sm text-muted-foreground">
-            © 2024 Job Pilot. Streamline your hiring process with AI.
-          </p>
-        </div>
-      </footer>
     </div>
   );
 };

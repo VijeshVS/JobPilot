@@ -1,10 +1,16 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 import subprocess
 import os
 from fastapi.middleware.cors import CORSMiddleware
+from typing import List
+import asyncio
+import json
+import time
 
 app = FastAPI()
+clients: List[asyncio.Queue] = []
 
 app.add_middleware(
     CORSMiddleware,
@@ -50,3 +56,41 @@ def complete(req: CompleteRequest):
 
     with open(OUTPUT_FILE, "r") as f:
         return {"result": f.read()}
+
+@app.get("/events")
+async def events(request: Request):
+    queue = asyncio.Queue()
+    clients.append(queue)
+
+    async def event_generator():
+        try:
+            while True:
+                if await request.is_disconnected():
+                    print("❌ Client disconnected")
+                    break
+
+                event = await queue.get()
+
+                payload = f"data: {json.dumps(event)}\n\n"
+
+                # ✅ LOG EXACTLY WHEN YOU SEND
+                print(f"📤 [{time.strftime('%H:%M:%S')}] Sent event → {event}", flush=True)
+
+                yield payload
+
+        finally:
+            clients.remove(queue)
+            print("🧹 Client queue removed", flush=True)
+
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream"
+    )
+
+
+@app.post("/emit")
+async def emit(event: dict):
+    for queue in clients:
+        await queue.put(event)
+
+    return {"status": "ok"}

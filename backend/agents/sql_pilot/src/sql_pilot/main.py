@@ -3,9 +3,12 @@ import warnings
 from sql_pilot.crew import SqlAgent
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 from pathlib import Path
+from listeners import MyCustomListener
 
 ROOT_DIR = Path(__file__).resolve().parents[2]  # project root
 INPUT_FILE = ROOT_DIR / "input.txt"
+
+my_listener = MyCustomListener()
 
 def run():
     """
