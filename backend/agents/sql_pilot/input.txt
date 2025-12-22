@@ -1,1 +1,1 @@
-get me the candidate knows React and cgpa >= 9.0
+Get me the candidates who are into backend technologies

@@ -19,9 +19,10 @@ export function SearchPrompt({ onSearch, isLoading }: SearchPromptProps) {
   };
 
   const examplePrompts = [
-    "Software engineers with 3+ years experience in React",
-    "Data scientists with strong Python and ML background",
-    "Fresh graduates in Computer Science with high GPA",
+    "Get me the candidates who has cgpa >= 9.0",
+    "Get me the candidates who are into backend technologies",
+    "Get me the candidates who has more than 4 yoe",
+    "Get me the candidates who has cgpa more than 8.8 and knows React"
   ];
 
   return (
