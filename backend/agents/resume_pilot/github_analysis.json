@@ -1,0 +1,31 @@
+{
+  "github_username": "ajayrm04",
+  "total_repositories": 2,
+  "verified_repos": [
+    {
+      "repo_name": "Ant_Colony_Algorithm_EL",
+      "owner": "ajayrm04",
+      "languages": [
+        "message",
+        "documentation_url"
+      ],
+      "forks": 0,
+      "stars": 0,
+      "commit_count": 0,
+      "readme_content": "Error fetching README from https://raw.githubusercontent.com/ajayrm04/Ant_Colony_Algorithm_EL/main/README.md: 404 Client Error: Not Found for url: https://raw.githubusercontent.com/ajayrm04/Ant_Colony_Algorithm_EL/main/README.md"
+    },
+    {
+      "repo_name": "nutriLens",
+      "owner": "ajayrm04",
+      "languages": [
+        "message",
+        "documentation_url",
+        "R"
+      ],
+      "forks": 0,
+      "stars": 0,
+      "commit_count": 0,
+      "readme_content": "# nutriLens\n \n"
+    }
+  ]
+}

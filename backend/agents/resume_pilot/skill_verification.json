@@ -1,0 +1,35 @@
+{
+  "resume_skills": [
+    "C",
+    "C++",
+    "Java",
+    "Python",
+    "HTML/CSS",
+    "Javascript",
+    "MongoDB",
+    "Neo4j",
+    "Agentic AI",
+    "Computer Vision",
+    "RAG",
+    "Knowledge Graph",
+    "VS Code",
+    "Intellij",
+    "Docker",
+    "Postman"
+  ],
+  "github_skills": [
+    "R",
+    "message",
+    "documentation_url"
+  ],
+  "percentage_score": 37.5,
+  "present_skills": [
+    "C",
+    "Javascript",
+    "Computer Vision",
+    "RAG",
+    "Knowledge Graph",
+    "Docker"
+  ],
+  "count_skills": 6
+}

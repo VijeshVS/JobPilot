@@ -1,0 +1,48 @@
+{
+  "name": "Yogendra Ajay Reddy",
+  "email": "ajay.mareddy04@gmail.com",
+  "phone": "8296301490",
+  "links": [
+    {
+      "platform": "Github",
+      "username": "ajayrm04"
+    },
+    {
+      "platform": "LinkedIn",
+      "username": "ajay-reddy"
+    }
+  ],
+  "projects": [
+    "NutriLens \u2013 Nutritional Analysis Tool",
+    "Ant Colony Algorithm Visualization for Networks"
+  ],
+  "experience": [
+    "Intern at Essuor"
+  ],
+  "cgpa": "9.71",
+  "field_of_study": "Information Science and Engineering",
+  "years_of_experience": "0",
+  "technical_skills": [
+    "C",
+    "C++",
+    "Java",
+    "Python",
+    "HTML/CSS",
+    "Javascript",
+    "MongoDB",
+    "Neo4j",
+    "Agentic AI",
+    "Computer Vision",
+    "RAG",
+    "Knowledge Graph",
+    "VS Code",
+    "Intellij",
+    "Docker",
+    "Postman"
+  ],
+  "github_links": [
+    "https://github.com/ajayrm04/Ant_Colony_Algorithm_EL",
+    "https://github.com/ajayrm04",
+    "https://github.com/ajayrm04/nutriLens"
+  ]
+}
