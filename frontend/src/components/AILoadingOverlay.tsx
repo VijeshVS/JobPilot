@@ -160,7 +160,7 @@ export function AILoadingOverlay({ events, isConnected, onCancel }: AILoadingOve
   return (
     <div className="w-full max-w-5xl mx-auto">
       {/* Compact Header */}
-      <div className="flex items-center justify-center gap-3 mb-4">
+      <div className="flex items-center justify-center gap-3 mb-8 mt-2">
         <div className="relative w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
           <Brain className="w-5 h-5 text-primary" />
           <span className="absolute -top-0.5 -right-0.5 flex h-2.5 w-2.5">
@@ -213,55 +213,58 @@ export function AILoadingOverlay({ events, isConnected, onCancel }: AILoadingOve
               <div className="border-t border-border/30" />
             )}
 
-            {/* Secondary Row: Memory, Knowledge, Operations in Grid */}
-            <div className="grid grid-cols-3 gap-4">
-              {/* Memory Column */}
-              <div className="space-y-2">
-                <div className="flex items-center gap-1.5">
-                  <Database className="w-3.5 h-3.5 text-blue-500" />
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                    Memory
-                  </span>
+            {/* Secondary Row: Memory & Knowledge (vertical) + Operations (remaining space) */}
+            <div className="flex gap-4">
+              {/* Left: Memory & Knowledge stacked vertically */}
+              <div className="flex flex-col gap-3 min-w-[140px]">
+                {/* Memory */}
+                <div className="space-y-1.5 p-2 rounded-lg bg-blue-500/5 border border-blue-500/20">
+                  <div className="flex items-center gap-1.5">
+                    <Database className="w-3.5 h-3.5 text-blue-500" />
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-blue-500">
+                      Memory
+                    </span>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    {memoryEvents.length > 0 ? (
+                      memoryEvents.map((event) => (
+                        <EventChip key={event.id} event={event} />
+                      ))
+                    ) : (
+                      <div className="text-xs text-muted-foreground/50 italic px-1">—</div>
+                    )}
+                  </div>
                 </div>
-                <div className="grid gap-1.5">
-                  {memoryEvents.length > 0 ? (
-                    memoryEvents.map((event) => (
-                      <EventChip key={event.id} event={event} />
-                    ))
-                  ) : (
-                    <div className="text-xs text-muted-foreground/50 italic px-1">—</div>
-                  )}
+
+                {/* Knowledge */}
+                <div className="space-y-1.5 p-2 rounded-lg bg-emerald-500/5 border border-emerald-500/20">
+                  <div className="flex items-center gap-1.5">
+                    <BookOpen className="w-3.5 h-3.5 text-emerald-500" />
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-500">
+                      Knowledge
+                    </span>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    {knowledgeEvents.length > 0 ? (
+                      knowledgeEvents.map((event) => (
+                        <EventChip key={event.id} event={event} />
+                      ))
+                    ) : (
+                      <div className="text-xs text-muted-foreground/50 italic px-1">—</div>
+                    )}
+                  </div>
                 </div>
               </div>
 
-              {/* Knowledge Column */}
-              <div className="space-y-2">
-                <div className="flex items-center gap-1.5">
-                  <BookOpen className="w-3.5 h-3.5 text-emerald-500" />
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                    Knowledge
-                  </span>
-                </div>
-                <div className="grid gap-1.5">
-                  {knowledgeEvents.length > 0 ? (
-                    knowledgeEvents.map((event) => (
-                      <EventChip key={event.id} event={event} />
-                    ))
-                  ) : (
-                    <div className="text-xs text-muted-foreground/50 italic px-1">—</div>
-                  )}
-                </div>
-              </div>
-
-              {/* Operations Column (LLM + Tool) */}
-              <div className="space-y-2">
+              {/* Right: Operations taking remaining space */}
+              <div className="flex-1 space-y-1.5 p-2 rounded-lg bg-orange-500/5 border border-orange-500/20">
                 <div className="flex items-center gap-1.5">
                   <Wrench className="w-3.5 h-3.5 text-orange-500" />
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-orange-500">
                     Operations
                   </span>
                 </div>
-                <div className="grid grid-cols-2 gap-1.5">
+                <div className="grid grid-cols-3 gap-1.5">
                   {operationEvents.length > 0 ? (
                     operationEvents.map((event) => (
                       <EventChip key={event.id} event={event} />
