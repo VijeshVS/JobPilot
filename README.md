@@ -149,16 +149,7 @@ CREWAI_TRACING_ENABLED=true
 
 ## 🎯 Usage
 
-### Starting the Application
-
-#### 1. Start the Backend API
-
-```bash
-cd backend
-python main.py
-```
-
-Or with auto-reload for development:
+### 1. Starting the Application
 
 ```bash
 cd backend
@@ -445,7 +436,7 @@ This project is available under the MIT License.
 
 ## 👥 Authors
 
-- **VijeshVS** - Initial work - [GitHub](https://github.com/VijeshVS)
+- **VijeshVS** - [GitHub](https://github.com/VijeshVS)
 
 ## 🙏 Acknowledgments
 
