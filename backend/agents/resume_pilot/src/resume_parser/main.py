@@ -9,10 +9,18 @@ import warnings
 from datetime import datetime
 from pathlib import Path
 from resume_parser.crew import ResumeParser
+import logging
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 BASE_DIR = Path(__file__).resolve().parents[2]
 
+logging.getLogger("crewai.telemetry").setLevel(logging.CRITICAL)
+
+# Silence OpenTelemetry exporter logs
+logging.getLogger("opentelemetry").setLevel(logging.CRITICAL)
+
+# Silence urllib3 retry/timeout logs
+logging.getLogger("urllib3").setLevel(logging.CRITICAL)
 
 def run():
     """

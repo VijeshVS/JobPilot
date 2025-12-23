@@ -69,7 +69,7 @@ class SqlAgent():
                 ListTablesTool(),
                 GetTableSchemaTool()
             ],
-            knowledge_sources=[text_source]
+            # knowledge_sources=[text_source]
         )
     
     @task
@@ -87,7 +87,7 @@ class SqlAgent():
             agents=self.agents,
             tasks=self.tasks,
             process=Process.sequential,
-            memory=True,
+            # memory=True,
             verbose=True,
             tracing=True
         )

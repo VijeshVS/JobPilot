@@ -5,38 +5,6 @@ from resume_parser.skill_tools.skill_utils import TECH_SKILLS_MASTER
 from resume_parser.utils import extract_edit_and_clean_json
 import fitz
 
-def extract_github_links(pdf_path):
-    doc = fitz.open(pdf_path)
-    github_links = []
-
-    for page_number in range(len(doc)):
-        page = doc[page_number]
-
-        # Extract links
-        for link in page.get_links():
-            if "uri" in link:
-                url = link["uri"]
-                if "github.com" in url.lower():
-                    github_links.append(url)
-
-    doc.close()
-
-    # Remove duplicates
-    github_links = list(set(github_links))
-
-    # Save to JSON
-    output = {
-        "github_links": github_links,
-        "count": len(github_links)
-    }
-
-    with open("extracted_github_links.json", "w", encoding="utf-8") as f:
-        json.dump(output, f, indent=2)
-
-    print("✅ Extracted GitHub links saved to extracted_github_links.json")
-
-    return github_links
-
 
 def append_json_data(source_file: str, destination_file: str):
     """
@@ -45,7 +13,7 @@ def append_json_data(source_file: str, destination_file: str):
     Destination will be a SINGLE JSON object.
     """
 
-    # extract_github_links("C:\\Users\\ajayr\\OneDrive\\Documents\\ML\\LAB\\resume_parser\\resume.pdf")
+    
     
     # ---------- CLEAN DESTINATION FILE (REMOVE ```json FENCES) ----------
     extract_edit_and_clean_json(destination_file)
@@ -220,3 +188,8 @@ def process_github_links(resume_got_off_path: str) -> str:
         return f"Invalid JSON in {resume_got_off_path}"
     except FileNotFoundError:
         return f"File not found: {resume_got_off_path}"
+
+if __name__ == "__main__":
+    resume_got_off_path = ""
+    result = process_github_links(resume_got_off_path)
+    print(result)

@@ -1,52 +1,28 @@
 {
   "candidates": [
     {
-      "name": "Vikram Joshi",
-      "email": "vikram15@example.com",
-      "usn": "1RV18EE015",
-      "phone": "9876543209",
-      "gender": "Male",
-      "cgpa": "6.95",
-      "field_of_study": "Electrical",
-      "years_of_experience": "5",
-      "created_at": "2025-12-19T15:22:10.85895",
-      "updated_at": "2025-12-19T15:22:10.85895"
+      "name": "John Doe",
+      "email": "john@example.com",
+      "usn": null,
+      "phone": null,
+      "gender": null,
+      "cgpa": null,
+      "field_of_study": null,
+      "years_of_experience": null,
+      "created_at": null,
+      "updated_at": null
     },
     {
-      "name": "Manish Gupta",
-      "email": "manish21@example.com",
-      "usn": "1RV18ME021",
-      "phone": "9876543215",
-      "gender": "Male",
-      "cgpa": "6.8",
-      "field_of_study": "Mechanical",
-      "years_of_experience": "6",
-      "created_at": "2025-12-19T15:26:49.714937",
-      "updated_at": "2025-12-19T15:26:49.714937"
-    },
-    {
-      "name": "Harsh Vardhan",
-      "email": "harsh25@example.com",
-      "usn": "1RV19EC025",
-      "phone": "9876543219",
-      "gender": "Male",
-      "cgpa": "7.3",
-      "field_of_study": "Electronics",
-      "years_of_experience": "5",
-      "created_at": "2025-12-19T15:26:49.714937",
-      "updated_at": "2025-12-19T15:26:49.714937"
-    },
-    {
-      "name": "ajay mareddy",
-      "email": "ajay@gmail.cpo,",
-      "usn": "1rv23is150",
-      "phone": "8296301497",
-      "gender": "male",
-      "cgpa": "9.71",
-      "field_of_study": "information science",
-      "years_of_experience": "80",
-      "created_at": "2025-12-22T12:04:36.477579",
-      "updated_at": "2025-12-22T12:04:36.477579"
+      "name": "Jane Doe",
+      "email": "jane@example.com",
+      "usn": null,
+      "phone": null,
+      "gender": null,
+      "cgpa": null,
+      "field_of_study": null,
+      "years_of_experience": null,
+      "created_at": null,
+      "updated_at": null
     }
   ]
 }
