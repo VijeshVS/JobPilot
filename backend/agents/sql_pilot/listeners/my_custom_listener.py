@@ -49,7 +49,8 @@ class MyCustomListener(BaseEventListener):
             payload = {
                 "type": "agent",
                 "action": "start",
-                "agent_role": event.agent.role
+                "agent_role": event.agent.role,
+                "agent_goal": event.agent.goal
             }
             requests.post(SSE_BACKEND, json=payload, timeout=2)
 
@@ -69,7 +70,8 @@ class MyCustomListener(BaseEventListener):
             payload = {
                 "type": "task",
                 "action": "start",
-                "task_name": event.task.name
+                "task_name": event.task.name,
+                "task_desc": event.task.description
             }
             requests.post(SSE_BACKEND, json=payload, timeout=2)
 
@@ -99,7 +101,8 @@ class MyCustomListener(BaseEventListener):
             payload = {
                 "type": "tool",
                 "action": "complete",
-                "tool_name": event.tool_name
+                "tool_name": event.tool_name,
+                "tool_output": event.output
             }
             requests.post(SSE_BACKEND, json=payload, timeout=2)
 
@@ -137,7 +140,8 @@ class MyCustomListener(BaseEventListener):
             payload = {
                 "type": "llm",
                 "action": "complete",
-                "model": event.model
+                "model": event.model,
+                "response": event.response
             }
             requests.post(SSE_BACKEND, json=payload, timeout=2)
 

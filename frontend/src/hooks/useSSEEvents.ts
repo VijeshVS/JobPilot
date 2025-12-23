@@ -22,6 +22,21 @@ const getEventName = (payload: SSEEventPayload): string => {
   }
 };
 
+const getEventDetails = (payload: SSEEventPayload): string | undefined => {
+  switch (payload.type) {
+    case 'agent':
+      return payload.agent_goal;
+    case 'task':
+      return payload.task_desc;
+    case 'tool':
+      return payload.tool_output;
+    case 'llm':
+      return payload.response;
+    default:
+      return undefined;
+  }
+};
+
 const getEventId = (payload: SSEEventPayload): string => {
   const name = getEventName(payload);
   return `${payload.type}-${name}`;
@@ -37,6 +52,12 @@ export const useSSEEvents = () => {
   const eventSourceRef = useRef<EventSource | null>(null);
 
   const connect = useCallback((prompt: string) => {
+    // If already connected, don't establish another connection
+    if (eventSourceRef.current) {
+      console.log("SSE already connected, skipping new connection");
+      return;
+    }
+
     // Reset state and event map
     setEvents([]);
     setIsComplete(false);
@@ -59,6 +80,7 @@ export const useSSEEvents = () => {
         if (payload.action === 'start') {
           const eventId = baseEventId + Date.now().toString();
           eventMap[baseEventId] = eventId;
+          const details = getEventDetails(payload);
 
           setEvents(prev => {
             if (prev.some(e => e.id === eventId && !e.isComplete)) {
@@ -71,7 +93,8 @@ export const useSSEEvents = () => {
                 type: payload.type,
                 name: eventName,
                 startTime: Date.now(),
-                isComplete: false
+                isComplete: false,
+                details
               }
             ];
           });
@@ -79,11 +102,12 @@ export const useSSEEvents = () => {
 
         if (payload.action === 'complete') {
           const eventId = eventMap[baseEventId];
+          const details = getEventDetails(payload);
           if (eventId) {
             setEvents(prev =>
               prev.map(e =>
                 e.id === eventId && !e.isComplete
-                  ? { ...e, isComplete: true }
+                  ? { ...e, isComplete: true, details: details || e.details }
                   : e
               )
             );
@@ -119,11 +143,17 @@ export const useSSEEvents = () => {
     setIsConnected(false);
   }, []);
 
+  const resetEvents = useCallback(() => {
+    setEvents([]);
+    setIsComplete(false);
+  }, []);
+
   return {
     events,
     isConnected,
     isComplete,
     connect,
-    disconnect
+    disconnect,
+    resetEvents
   };
 };

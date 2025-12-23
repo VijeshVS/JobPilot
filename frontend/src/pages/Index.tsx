@@ -1,18 +1,21 @@
 import { useState } from 'react';
-import { Plane } from 'lucide-react';
+import { Plane, FileSearch } from 'lucide-react';
 import { SearchPrompt } from '@/components/SearchPrompt';
 import { CandidateGrid } from '@/components/CandidateGrid';
 import { AILoadingOverlay } from '@/components/AILoadingOverlay';
+import { WorkflowReviewModal } from '@/components/WorkflowReviewModal';
 import { Candidate } from '@/types/candidate';
 import { mockCandidates } from '@/data/mockCandidates';
 import { useSSEEvents } from '@/hooks/useSSEEvents';
 import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
 
 const Index = () => {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
-  const { events, isConnected, isComplete, connect, disconnect } = useSSEEvents();
+  const [showWorkflowReview, setShowWorkflowReview] = useState(false);
+  const { events, isConnected, isComplete, connect, disconnect, resetEvents } = useSSEEvents();
   const { toast } = useToast();
 
   const fetchCandidates = async (prompt: string) => {
@@ -47,12 +50,19 @@ const Index = () => {
   };
 
   const handleSearch = async (prompt: string) => {
+    // Disconnect existing connection before starting new one
+    if (isConnected) {
+      disconnect();
+    }
+    
     setIsLoading(true);
     setHasSearched(true);
     setCandidates([]);
+    resetEvents();
     
     // Connect to SSE and fetch candidates concurrently
-    connect(prompt);
+    // Small delay to ensure previous connection is closed
+    setTimeout(() => connect(prompt), 100);
     fetchCandidates(prompt);
   };
 
@@ -107,8 +117,29 @@ const Index = () => {
 
         {/* Results Section */}
         {!isLoading && hasSearched && (
-          <CandidateGrid candidates={candidates} isLoading={false} />
+          <div className="space-y-4">
+            {events.length > 0 && (
+              <div className="flex justify-center">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowWorkflowReview(true)}
+                  className="gap-2"
+                >
+                  <FileSearch className="w-4 h-4" />
+                  Review AI Workflow
+                </Button>
+              </div>
+            )}
+            <CandidateGrid candidates={candidates} isLoading={false} />
+          </div>
         )}
+
+        {/* Workflow Review Modal */}
+        <WorkflowReviewModal 
+          open={showWorkflowReview}
+          onOpenChange={setShowWorkflowReview}
+          events={events}
+        />
       </main>
     </div>
   );

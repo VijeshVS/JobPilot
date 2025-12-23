@@ -1,1 +1,1 @@
-Get me the candidates who has more than 4 yoe
+Get me the candidates who has cgpa >= 9.0

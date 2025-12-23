@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { 
   Sparkles, 
   Loader2, 
@@ -10,11 +11,18 @@ import {
   Cpu,
   Database,
   X,
-  ChevronRight
+  ChevronRight,
+  Eye
 } from 'lucide-react';
 import { ActiveEvent, SSEEventType } from '@/types/sseEvents';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 interface AILoadingOverlayProps {
   events: ActiveEvent[];
@@ -105,6 +113,8 @@ const getEventLabel = (type: SSEEventType): string => {
 };
 
 export function AILoadingOverlay({ events, isConnected, onCancel }: AILoadingOverlayProps) {
+  const [selectedEvent, setSelectedEvent] = useState<ActiveEvent | null>(null);
+
   // Group events by hierarchy
   const crewEvents = events.filter(e => e.type === 'crew');
   const taskEvents = events.filter(e => e.type === 'task');
@@ -118,6 +128,21 @@ export function AILoadingOverlay({ events, isConnected, onCancel }: AILoadingOve
     { label: 'Task', events: taskEvents, level: 1 },
     { label: 'Agent', events: agentEvents, level: 2 },
   ].filter(g => g.events.length > 0);
+
+  const getDetailLabel = (type: SSEEventType): string => {
+    switch (type) {
+      case 'agent':
+        return 'Agent Goal';
+      case 'task':
+        return 'Task Description';
+      case 'tool':
+        return 'Tool Output';
+      case 'llm':
+        return 'LLM Response';
+      default:
+        return 'Details';
+    }
+  };
 
   const EventChip = ({ event }: { event: ActiveEvent }) => {
     const Icon = getEventIcon(event.type);
@@ -144,7 +169,7 @@ export function AILoadingOverlay({ events, isConnected, onCancel }: AILoadingOve
         </div>
         
         <span className={cn(
-          "text-xs font-medium truncate",
+          "text-xs font-medium truncate max-w-[100px]",
           event.isComplete ? "text-muted-foreground" : "text-foreground"
         )}>
           {event.name}
@@ -153,14 +178,63 @@ export function AILoadingOverlay({ events, isConnected, onCancel }: AILoadingOve
         {!event.isComplete && (
           <Loader2 className={cn("w-3 h-3 animate-spin shrink-0", colors.text)} />
         )}
+
+        {event.details && (
+          <button
+            onClick={() => setSelectedEvent(event)}
+            className={cn(
+              "ml-1 p-1 rounded hover:bg-background/50 transition-colors shrink-0",
+              colors.text
+            )}
+            title="View details"
+          >
+            <Eye className="w-3 h-3" />
+          </button>
+        )}
       </div>
     );
   };
 
   return (
+    <>
+    <Dialog open={!!selectedEvent} onOpenChange={(open) => !open && setSelectedEvent(null)}>
+      <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
+        {selectedEvent && (
+          <>
+            <DialogHeader className="shrink-0">
+              <div className="flex items-center gap-3">
+                <div className={cn(
+                  "w-8 h-8 rounded-lg flex items-center justify-center",
+                  getEventColor(selectedEvent.type).light
+                )}>
+                  {(() => {
+                    const Icon = getEventIcon(selectedEvent.type);
+                    return <Icon className={cn("w-4 h-4", getEventColor(selectedEvent.type).text)} />;
+                  })()}
+                </div>
+                <div>
+                  <DialogTitle className="text-lg">{selectedEvent.name}</DialogTitle>
+                  <p className="text-xs text-muted-foreground">
+                    {getEventLabel(selectedEvent.type)} • {getDetailLabel(selectedEvent.type)}
+                  </p>
+                </div>
+              </div>
+            </DialogHeader>
+            <div className="flex-1 overflow-auto mt-4">
+              <div className="bg-muted/50 rounded-lg p-4 border border-border/50">
+                <pre className="text-sm text-foreground whitespace-pre-wrap break-words font-mono leading-relaxed">
+                  {selectedEvent.details}
+                </pre>
+              </div>
+            </div>
+          </>
+        )}
+      </DialogContent>
+    </Dialog>
+
     <div className="w-full max-w-5xl mx-auto">
       {/* Compact Header */}
-      <div className="flex items-center justify-center gap-3 mb-8 mt-2">
+      <div className="flex items-center justify-center gap-3 mb-8 mt-3">
         <div className="relative w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
           <Brain className="w-5 h-5 text-primary" />
           <span className="absolute -top-0.5 -right-0.5 flex h-2.5 w-2.5">
@@ -312,5 +386,6 @@ export function AILoadingOverlay({ events, isConnected, onCancel }: AILoadingOve
         )}
       </div>
     </div>
+    </>
   );
 }

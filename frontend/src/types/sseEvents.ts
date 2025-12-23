@@ -14,9 +14,13 @@ export interface SSEEventPayload {
   action: SSEEventAction;
   crew_name?: string;
   agent_role?: string;
+  agent_goal?: string;
   task_name?: string;
+  task_desc?: string;
   tool_name?: string;
+  tool_output?: string;
   model?: string;
+  response?: string;
 }
 
 export interface ActiveEvent {
@@ -25,4 +29,5 @@ export interface ActiveEvent {
   name: string;
   startTime: number;
   isComplete: boolean;
+  details?: string;
 }
