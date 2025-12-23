@@ -1,1 +1,1 @@
-Get me the candidates who has cgpa more than 8.8 and knows React
+Get me the candidates who has more than 4 yoe

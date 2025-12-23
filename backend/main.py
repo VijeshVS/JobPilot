@@ -94,3 +94,5 @@ async def emit(event: dict):
         await queue.put(event)
 
     return {"status": "ok"}
+
+# frontend -> backend, resume.pdf 
