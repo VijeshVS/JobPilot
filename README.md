@@ -158,6 +158,13 @@ cd backend
 python main.py
 ```
 
+Or with auto-reload for development:
+
+```bash
+cd backend
+uvicorn main:app --reload
+```
+
 The backend API will run on `http://localhost:8000`
 
 #### 2. Start the Frontend
