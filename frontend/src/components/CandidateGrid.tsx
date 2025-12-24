@@ -5,6 +5,7 @@ import { Users } from "lucide-react";
 interface CandidateGridProps {
   candidates: Candidate[];
   isLoading: boolean;
+  onCandidateClick?: (candidate: Candidate) => void;
 }
 
 function LoadingSkeleton() {
@@ -32,7 +33,7 @@ function LoadingSkeleton() {
   );
 }
 
-export function CandidateGrid({ candidates, isLoading }: CandidateGridProps) {
+export function CandidateGrid({ candidates, isLoading, onCandidateClick }: CandidateGridProps) {
   if (isLoading) {
     return <LoadingSkeleton />;
   }
@@ -68,6 +69,7 @@ export function CandidateGrid({ candidates, isLoading }: CandidateGridProps) {
             key={candidate.usn} 
             candidate={candidate} 
             index={index}
+            onClick={() => onCandidateClick?.(candidate)}
           />
         ))}
       </div>

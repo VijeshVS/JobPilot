@@ -11,3 +11,28 @@ export interface Candidate {
   created_at: string | null;
   updated_at: string | null;
 }
+
+export interface CandidateSkill {
+  skill_name: string;
+}
+
+export interface CandidateLink {
+  link_type: string;
+  link_url: string;
+}
+
+export interface CandidateExperience {
+  role_title: string;
+  company_name: string;
+  start_date: string;
+  end_date: string | null;
+  description: string | null;
+}
+
+export interface CandidateDetails extends Candidate {
+  resume_score: number | null;
+  no_of_skills: number | null;
+  candidate_skills: CandidateSkill[];
+  candidate_links: CandidateLink[];
+  candidate_experience: CandidateExperience[];
+}

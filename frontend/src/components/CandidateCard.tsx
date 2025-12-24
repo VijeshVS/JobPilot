@@ -6,13 +6,15 @@ import { Mail, Phone, GraduationCap, Briefcase, User } from "lucide-react";
 interface CandidateCardProps {
   candidate: Candidate;
   index: number;
+  onClick?: () => void;
 }
 
-export function CandidateCard({ candidate, index }: CandidateCardProps) {
+export function CandidateCard({ candidate, index, onClick }: CandidateCardProps) {
   return (
     <Card 
-      className="group shadow-card hover:shadow-elevated transition-all duration-300 border-border/50 hover:border-primary/20 bg-card overflow-hidden animate-fade-in"
+      className="group shadow-card hover:shadow-elevated transition-all duration-300 border-border/50 hover:border-primary/20 bg-card overflow-hidden animate-fade-in cursor-pointer"
       style={{ animationDelay: `${index * 80}ms` }}
+      onClick={onClick}
     >
       <CardContent className="p-6">
         <div className="flex items-start justify-between mb-4">
@@ -24,7 +26,9 @@ export function CandidateCard({ candidate, index }: CandidateCardProps) {
             </div>
             <div>
               <h3 className="font-semibold text-foreground text-lg group-hover:text-primary transition-colors">
-                {candidate.name}
+                {candidate.name.length > 10
+  ? `${candidate.name.slice(0, 9)}...`
+  : candidate.name}
               </h3>
               <p className="text-muted-foreground text-sm">{candidate.field_of_study || 'Not specified'}</p>
             </div>

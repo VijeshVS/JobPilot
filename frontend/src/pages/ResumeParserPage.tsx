@@ -95,11 +95,12 @@ const ResumeUploadPage: React.FC = () => {
 
         {/* Title */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-2">Parse Your Resume</h1>
-          <p className="text-gray-400">
-            Upload a resume and let our AI extract structured insights automatically
-          </p>
-        </div>
+  <h1 className="text-4xl font-bold mb-2">Apply for This Position</h1>
+  <p className="text-gray-400">
+    Upload your resume to submit your application. Our team will review it and contact you if there’s a match.
+  </p>
+</div>
+
 
         {/* Upload Card */}
         <Card className="w-full max-w-3xl bg-gray-900 border-gray-700">

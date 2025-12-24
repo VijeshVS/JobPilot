@@ -6,7 +6,8 @@ import { SearchPrompt } from '@/components/SearchPrompt';
 import { CandidateGrid } from '@/components/CandidateGrid';
 import { AILoadingOverlay } from '@/components/AILoadingOverlay';
 import { WorkflowReviewModal } from '@/components/WorkflowReviewModal';
-import { Candidate } from '@/types/candidate';
+import { CandidateDetailsModal } from '@/components/CandidateDetailsModal';
+import { Candidate, CandidateDetails } from '@/types/candidate';
 import { mockCandidates } from '@/data/mockCandidates';
 import { useSSEEvents } from '@/hooks/useSSEEvents';
 import { useToast } from '@/hooks/use-toast';
@@ -19,6 +20,9 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [showWorkflowReview, setShowWorkflowReview] = useState(false);
+  const [showCandidateDetails, setShowCandidateDetails] = useState(false);
+  const [selectedCandidateDetails, setSelectedCandidateDetails] = useState<CandidateDetails | null>(null);
+  const [isLoadingDetails, setIsLoadingDetails] = useState(false);
   const { events, isConnected, isComplete, connect, disconnect, resetEvents } = useSSEEvents();
   const { toast } = useToast();
 
@@ -74,6 +78,46 @@ const Index = () => {
   const handleCancel = () => {
     disconnect();
     setIsLoading(false);
+  };
+
+  const handleCandidateClick = async (candidate: Candidate) => {
+    if (!candidate.usn) {
+      toast({
+        title: "Cannot fetch details",
+        description: "Candidate USN is not available",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setShowCandidateDetails(true);
+    setIsLoadingDetails(true);
+    setSelectedCandidateDetails(null);
+
+    try {
+      const response = await fetch('http://localhost:8000/candidates/by-usn', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ usn: candidate.usn }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch candidate details');
+      }
+
+      const data: CandidateDetails = await response.json();
+      setSelectedCandidateDetails(data);
+    } catch (error) {
+      console.error('Error fetching candidate details:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch candidate details",
+        variant: "destructive",
+      });
+      setShowCandidateDetails(false);
+    } finally {
+      setIsLoadingDetails(false);
+    }
   };
 
   const navigate = useNavigate()
@@ -153,7 +197,11 @@ const Index = () => {
                 </Button>
               </div>
             )}
-            <CandidateGrid candidates={candidates} isLoading={false} />
+            <CandidateGrid 
+              candidates={candidates} 
+              isLoading={false} 
+              onCandidateClick={handleCandidateClick}
+            />
           </div>
         )}
 
@@ -162,6 +210,14 @@ const Index = () => {
           open={showWorkflowReview}
           onOpenChange={setShowWorkflowReview}
           events={events}
+        />
+
+        {/* Candidate Details Modal */}
+        <CandidateDetailsModal
+          open={showCandidateDetails}
+          onOpenChange={setShowCandidateDetails}
+          candidate={selectedCandidateDetails}
+          isLoading={isLoadingDetails}
         />
       </main>
 

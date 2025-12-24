@@ -1,1 +1,0 @@
-Get me the candidates who has cgpa >= 9.0

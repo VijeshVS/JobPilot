@@ -10,17 +10,25 @@ import json
 import time
 from pathlib import Path
 import shutil
+from supabase import create_client, Client
+from dotenv import load_dotenv
 
+load_dotenv()
 app = FastAPI()
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+
 clients: List[asyncio.Queue] = []
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],    
-    allow_credentials=True,
-    allow_methods=["*"],        
-    allow_headers=["*"],       
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
+
 
 AGENTS_DIR = os.path.abspath("./agents")
 
@@ -34,6 +42,8 @@ RESUME_BASE_DIR = os.path.join(AGENTS_DIR, "resume_pilot")
 class CompleteRequest(BaseModel):
     input: str
 
+class CandidateByUSNRequest(BaseModel):
+    usn: str
 
 @app.post("/complete")
 def complete(req: CompleteRequest):
@@ -51,7 +61,7 @@ def complete(req: CompleteRequest):
             check=True,
             capture_output=True,
             text=True,
-            timeout=120
+            timeout=300
         )
     except subprocess.CalledProcessError as e:
         raise HTTPException(500, f"CrewAI failed: {e.stderr}")
@@ -162,3 +172,44 @@ async def parse_resume(file: UploadFile = File(...)):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/candidates/by-usn")
+def get_candidate_by_usn(req: CandidateByUSNRequest):
+    response = (
+        supabase
+        .from_("candidates")
+        .select("""
+            candidate_id,
+            name,
+            email,
+            usn,
+            phone,
+            gender,
+            cgpa,
+            field_of_study,
+            years_of_experience,
+            resume_score,
+            no_of_skills,
+            created_at,
+            updated_at,
+            candidate_skills (
+                skill_name
+            ),
+            candidate_links (
+                link_type,
+                link_url
+            ),
+            candidate_experience (
+                role_title,
+                company_name,
+                start_date,
+                end_date,
+                description
+            )
+        """)
+        .eq("usn", req.usn)
+        .single()
+        .execute()
+    )
+
+    return response.data
