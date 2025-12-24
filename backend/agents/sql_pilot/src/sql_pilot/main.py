@@ -22,9 +22,9 @@ def run():
         }
         try:
             crew = SqlAgent().crew()
-            # crew.reset_memories(command_type='short')     # Short-term memory
-            # crew.reset_memories(command_type='long')      # Long-term memory
-            # crew.reset_memories(command_type='entity')    # Entity memory
+            crew.reset_memories(command_type='short')     # Short-term memory
+            crew.reset_memories(command_type='long')      # Long-term memory
+            crew.reset_memories(command_type='entity')    # Entity memory
             crew.kickoff(inputs=inputs)
         except Exception as e:
             raise Exception(f"An error occurred while running the crew: {e}")
