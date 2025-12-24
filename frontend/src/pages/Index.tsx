@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { Plane, FileSearch } from 'lucide-react';
+import { FileSearch } from 'lucide-react';
+import { Plane, FileUp } from 'lucide-react';
+
 import { SearchPrompt } from '@/components/SearchPrompt';
 import { CandidateGrid } from '@/components/CandidateGrid';
 import { AILoadingOverlay } from '@/components/AILoadingOverlay';
@@ -9,6 +11,8 @@ import { mockCandidates } from '@/data/mockCandidates';
 import { useSSEEvents } from '@/hooks/useSSEEvents';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
+import ResumeParser from "@/components/ResumeParser";
+import { useNavigate } from "react-router-dom"
 
 const Index = () => {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
@@ -32,7 +36,7 @@ const Index = () => {
       console.log(results);
       setCandidates(results);
       setIsLoading(false);
-      
+
       toast({
         title: "Candidates Found",
         description: `Found ${results.length} matching candidates`,
@@ -58,8 +62,9 @@ const Index = () => {
     setIsLoading(true);
     setHasSearched(true);
     setCandidates([]);
+
     resetEvents();
-    
+
     // Connect to SSE and fetch candidates concurrently
     // Small delay to ensure previous connection is closed
     setTimeout(() => connect(prompt), 100);
@@ -71,22 +76,40 @@ const Index = () => {
     setIsLoading(false);
   };
 
+  const navigate = useNavigate()
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b border-border/50 bg-card/30 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-6 py-4">
+        <div className="container mx-auto px-6 py-4 flex items-center justify-between">
+
+          {/* Left */}
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-primary flex items-center justify-center">
               <Plane className="w-5 h-5 text-primary-foreground" />
             </div>
             <div>
               <h1 className="text-xl font-bold text-foreground">Job Pilot</h1>
-              <p className="text-xs text-muted-foreground">AI-Powered Candidate Search</p>
+              <p className="text-xs text-muted-foreground">
+                AI-Powered Candidate Search
+              </p>
             </div>
           </div>
+
+          {/* Right Button */}
+          <button
+            onClick={() => navigate("/parse-resume")}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg
+                 bg-blue-600 hover:bg-blue-700 text-white transition"
+          >
+            <FileUp className="w-4 h-4" />
+            Upload Resume
+          </button>
+
         </div>
       </header>
+
 
       {/* Main Content */}
       <main className="container mx-auto px-6 py-12">
@@ -100,15 +123,15 @@ const Index = () => {
               Describe the ideal candidate and let our AI agents search through the talent pool
             </p>
           </div>
-          
+
           <SearchPrompt onSearch={handleSearch} isLoading={isLoading} />
         </div>
 
         {/* Loading Overlay */}
         {isLoading && (
           <div className="mb-12">
-            <AILoadingOverlay 
-              events={events} 
+            <AILoadingOverlay
+              events={events}
               isConnected={isConnected}
               onCancel={handleCancel}
             />
@@ -141,6 +164,7 @@ const Index = () => {
           events={events}
         />
       </main>
+
     </div>
   );
 };

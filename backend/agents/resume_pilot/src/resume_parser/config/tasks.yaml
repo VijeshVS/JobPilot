@@ -1,0 +1,78 @@
+link_extraction_task:
+  description: |
+    Extract the following information from the provided resume and output it as a JSON object.
+
+    The JSON object should have the following keys:
+
+    1.  **'links'**: An array of objects. Each object should represent a profile link and have two keys:
+        *   **'platform'**: The name of the platform (e.g., 'Github', 'LinkedIn', 'LeetCode').
+        *   **'username'**: The username extracted from the link (e.g., 'rahul-reddy' from 'github.com/rahul-reddy').
+        If a platform link is not found, omit its object from this array.
+
+    2.  **'projects'**: An array of strings, where each string is a description of a project from the resume. If no projects are found, this array should be empty.
+
+    3.  **'experience'**: An array of strings, where each string is a detail of an experience entry from the resume. If no experience details are found, this array should be empty.
+
+    4.  **'cgpa'**: The CGPA (Cumulative Grade Point Average) mentioned in the resume. If not found, set to `null`.
+
+    5.  **'field_of_study'**: The academic department or field of study the user belongs to. If not found, set to `null`.
+
+    6.  **'technical_skills'**: An array of strings, listing any technical skills mentioned (e.g., 'ReactJS', 'Python', 'JavaScript', 'AWS', 'Docker'). If no technical skills are found, this array should be empty.
+
+    7.  **'name'**: The full name of the candidate as mentioned in the resume. If not found, set to `null`.
+
+    8.  **'email'**: The email address of the candidate. If not found, set to `null`.
+
+    9.  **'phone'**: The phone number of the candidate. If not found, set to `null`.
+
+    10. **'years_of_experience'**: The total years of professional experience inferred or explicitly mentioned in the resume. If not found or no experience put off 0`.
+
+    Ensure all relevant profile links are extracted, and for each, identify the platform and username. Make sure to capture all projects, experience details, CGPA, field of study, name, email, phone number, years of experience, and technical skills present in the resume.
+  
+  expected_output: |
+    A JSON object containing the extracted links, projects, experience, cgpa, field_of_study, technical_skills, name, email, phone, and years_of_experience.
+    CRITICAL: The response MUST be a single, valid JSON object with NO additional text, markdown fences, or explanations. Any deviation will break downstream processing.
+    Example:
+    {
+      "name": "Rahul Reddy",
+      "email": "rahul.reddy@example.com",
+      "phone": "9876543210",
+      "links": [
+        {
+          "platform": "Github",
+          "username": "rahul-reddy"
+        },
+        {
+          "platform": "LinkedIn",
+          "username": "rahul-reddy"
+        }
+      ],
+      "projects": [
+        "Project A: Developed X using Y.",
+        "Project B: Implemented Z with W."
+      ],
+      "experience": [
+        "Software Engineer at Company X (2020-2022): Developed A, B, C."
+      ],
+      "cgpa": "3.8",
+      "field_of_study": "Computer Science",
+      "years_of_experience": "2",
+      "technical_skills": [
+        "Python",
+        "ReactJS",
+        "AWS"
+      ]
+    }
+    STRICTLY USE THIS FORMAT ONLY.
+    IF YOU CANT FIND ANY OF THESE JUST FILL THEM WITH NULL.
+    STRICTLY THE OUTPUT SHOULD ONLY BE IN JSON FORMAT.
+    DO NOT ADD ANY OF THIS 
+    ```json
+    <JSON INSIDE>
+    ```
+    NOTE (VVVVVIMP):
+    THE input file is resume.pdf for this task.
+
+        ```
+  output_file: resume_got_off.json
+  agent: link_extractor

@@ -1,0 +1,46 @@
+{
+  "name": "Vinayak Kumar Singh",
+  "email": "govvinayak@gmail.com",
+  "phone": "+91 8217803420",
+  "links": [
+    {
+      "platform": "Github",
+      "username": "VinayakKumarSingh"
+    },
+    {
+      "platform": "LinkedIn",
+      "username": "Vinayak Singh"
+    }
+  ],
+  "projects": [
+    "LocateX |ESP-32, Raspberry Pi,Sensors,HTML/CSS,Flask |/github Jun. 2025",
+    "CryptoComplexity \u2013 ABE Algorithm Complexity Analysis |Python, Django, Chart.js, HTML/CSS |/github Jul. 2025",
+    "Virtual Tourist |Next.js, TypeScript, A-Frame |/github |\u1f517 Jan. 2025"
+  ],
+  "experience": [
+    "National Service Scheme (NSS) RV College of Engineering",
+    "Volunteer 2023\u2013Present"
+  ],
+  "cgpa": "9.02",
+  "field_of_study": "Information Science and Engineering",
+  "technical_skills": [
+    "C++",
+    "C",
+    "Java",
+    "Python",
+    "HTML/CSS",
+    "MATLAB",
+    "Django",
+    "Flask",
+    "Arduino",
+    "IoT",
+    "Linux"
+  ],
+  "years_of_experience": "0",
+  "github_links": [
+    "https://github.com/nerdylua/Virtual-tourist.git",
+    "https://github.com/VinayakKumarSingh",
+    "https://github.com/VinayakKumarSingh/LocateX2.0",
+    "https://github.com/VinayakKumarSingh/CryptoComplexityAnalyse"
+  ]
+}
