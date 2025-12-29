@@ -15,20 +15,10 @@ def normalize_sql(query: str) -> str:
         return ""
 
     q = query
-
-    # Remove escaped newlines like \n
     q = q.replace("\\n", " ")
-
-    # Remove box-drawing / terminal junk (│, ─, etc.)
     q = re.sub(r"[│─┌┐└┘├┤┬┴┼]", " ", q)
-
-    # Remove stray backslashes
     q = q.replace("\\", " ")
-
-    # Remove trailing semicolon
     q = q.rstrip().rstrip(";")
-
-    # Collapse multiple spaces
     q = re.sub(r"\s+", " ", q)
 
     return q.strip()

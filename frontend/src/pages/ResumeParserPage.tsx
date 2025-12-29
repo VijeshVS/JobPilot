@@ -66,17 +66,21 @@ const ResumeUploadPage: React.FC = () => {
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
 
           {/* Left branding */}
-          <div className="flex items-center gap-3">
+          {/* Left */}
+          <button 
+            onClick={() => navigate("/home")}
+            className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+          >
             <div className="w-10 h-10 rounded-xl bg-gradient-primary flex items-center justify-center">
               <Plane className="w-5 h-5 text-primary-foreground" />
             </div>
-            <div>
+            <div className="text-left">
               <h1 className="text-xl font-bold text-foreground">Job Pilot</h1>
               <p className="text-xs text-muted-foreground">
-                AI Resume Parser
+                AI-Powered Candidate Search
               </p>
             </div>
-          </div>
+          </button>
 
           {/* Right action */}
           <button
@@ -152,7 +156,7 @@ const ResumeUploadPage: React.FC = () => {
             `}
             >
               {loading && <span className="loader" />}
-              {loading ? 'Parsing resume...' : 'Parse Resume'}
+              {loading ? 'Processing.....' : 'Apply'}
             </button>
 
             {/* Result Section */}

@@ -137,7 +137,7 @@ const ResumeParser = () => {
               className="min-w-[180px]"
             >
               <Search className="w-5 h-5" />
-              {isProcessing ? "Processing..." : "Parse Resume"}
+              {isProcessing ? "Processing..." : "Apply"}
             </Button>
           </div>
         </div>
