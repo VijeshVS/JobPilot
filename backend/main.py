@@ -23,8 +23,8 @@ clients: List[asyncio.Queue] = []
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False,
+    allow_origins=["http://localhost:8080"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -194,17 +194,6 @@ def get_candidate_by_usn(req: CandidateByUSNRequest):
             updated_at,
             candidate_skills (
                 skill_name
-            ),
-            candidate_links (
-                link_type,
-                link_url
-            ),
-            candidate_experience (
-                role_title,
-                company_name,
-                start_date,
-                end_date,
-                description
             )
         """)
         .eq("usn", req.usn)

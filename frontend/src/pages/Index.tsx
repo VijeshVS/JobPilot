@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { FileSearch } from 'lucide-react';
+import { FileSearch, ArrowLeft } from 'lucide-react';
 import { Plane, FileUp } from 'lucide-react';
-
+import { supabase } from "../lib/supabaseClient";
 import { SearchPrompt } from '@/components/SearchPrompt';
 import { CandidateGrid } from '@/components/CandidateGrid';
 import { AILoadingOverlay } from '@/components/AILoadingOverlay';
@@ -62,7 +62,7 @@ const Index = () => {
     if (isConnected) {
       disconnect();
     }
-    
+
     setIsLoading(true);
     setHasSearched(true);
     setCandidates([]);
@@ -78,6 +78,15 @@ const Index = () => {
   const handleCancel = () => {
     disconnect();
     setIsLoading(false);
+  };
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+
+    localStorage.removeItem("isAuthenticated");
+    localStorage.removeItem("role");
+
+    navigate("/login");
   };
 
   const handleCandidateClick = async (candidate: Candidate) => {
@@ -129,8 +138,8 @@ const Index = () => {
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
 
           {/* Left */}
-          <button 
-            onClick={() => navigate("/home")}
+          <button
+            onClick={() => navigate("/login")}
             className="flex items-center gap-3 hover:opacity-80 transition-opacity"
           >
             <div className="w-10 h-10 rounded-xl bg-gradient-primary flex items-center justify-center">
@@ -145,14 +154,24 @@ const Index = () => {
           </button>
 
           {/* Right Button */}
-          <button
-            onClick={() => navigate("/parse-resume")}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg
-                 bg-blue-600 hover:bg-blue-700 text-white transition"
-          >
-            <FileUp className="w-4 h-4" />
-            Upload Resume
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => navigate("/login")}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg
+         bg-blue-600 hover:bg-blue-700 text-white transition"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to Home
+            </button>
+
+            <button
+              onClick={handleSignOut}
+              className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white transition"
+            >
+              Sign Out
+            </button>
+          </div>
+
 
         </div>
       </header>
@@ -190,8 +209,8 @@ const Index = () => {
           <div className="space-y-4">
             {events.length > 0 && (
               <div className="flex justify-center">
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   onClick={() => setShowWorkflowReview(true)}
                   className="gap-2"
                 >
@@ -200,16 +219,16 @@ const Index = () => {
                 </Button>
               </div>
             )}
-            <CandidateGrid 
-              candidates={candidates} 
-              isLoading={false} 
+            <CandidateGrid
+              candidates={candidates}
+              isLoading={false}
               onCandidateClick={handleCandidateClick}
             />
           </div>
         )}
 
         {/* Workflow Review Modal */}
-        <WorkflowReviewModal 
+        <WorkflowReviewModal
           open={showWorkflowReview}
           onOpenChange={setShowWorkflowReview}
           events={events}

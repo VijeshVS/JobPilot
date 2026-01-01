@@ -2,6 +2,9 @@ import json
 from pathlib import Path
 from resume_parser.db.repositories.skills_repo import insert_skills_for_candidate
 from resume_parser.db.repositories.candidate_repo import insert_candidate
+from resume_parser.db.repositories.candidate_links_repo import insert_links_for_candidate
+from resume_parser.db.repositories.candidate_experience_repo import insert_experience_for_candidate
+
 import random
 
 
@@ -66,6 +69,8 @@ def insert_candidate_and_skills(
     experience_list = data.get("experience", [])
     years_of_experience = calculate_years_of_experience(experience_list)
 
+    links_list = data.get("links", [])
+
     # -----------------------------
     # USN generation
     # -----------------------------
@@ -113,11 +118,37 @@ def insert_candidate_and_skills(
     skills = data2.get("present_skills", [])
     skills_inserted = insert_skills_for_candidate(candidate_id, skills)
 
+    # -----------------------------
+    # Insert Candidate Links
+    # -----------------------------
+    links_inserted = insert_links_for_candidate(
+        candidate_id=candidate_id,
+        links_list=links_list
+    )
+
+    # -----------------------------
+    # Insert Candidate Experience
+    # -----------------------------
+    experience_inserted = insert_experience_for_candidate(
+        candidate_id=candidate_id,
+        years_of_experience=years_of_experience,
+        experience_list=experience_list
+    )
+
     return {
         "candidate_id": candidate_id,
         "usn": usn,
         "no_of_skills": no_of_skills,
         "resume_score": resume_score,
-        "skills_inserted": skills_inserted
+        "skills_inserted": skills_inserted,
+        "links_inserted": links_inserted,
+        "experience_inserted": experience_inserted
     }
+
+if __name__ == "__main__":
+    insert_candidate_and_skills(
+        resume_json_path="C:\\Users\\ajayr\\OneDrive\\Documents\\ML\\LAB\\JobPilot\\backend\\agents\\resume_pilot\\resume_got_off.json",
+        skill_json_path="C:\\Users\\ajayr\\OneDrive\\Documents\\ML\\LAB\\JobPilot\\backend\\agents\\resume_pilot\\skill_verification.json"
+    )
+    
 

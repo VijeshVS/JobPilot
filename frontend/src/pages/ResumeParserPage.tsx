@@ -3,7 +3,7 @@ import { Input } from '../components/ui/input'
 import { Card, CardContent } from '../components/ui/card'
 import { Upload, Plane, ArrowLeft } from 'lucide-react'
 import { useNavigate } from "react-router-dom"
-
+import { supabase } from "../lib/supabaseClient";
 
 const ResumeUploadPage: React.FC = () => {
   const [resumeFile, setResumeFile] = useState<File | null>(null)
@@ -56,6 +56,15 @@ const ResumeUploadPage: React.FC = () => {
     }
   }
 
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+
+    localStorage.removeItem("isAuthenticated");
+    localStorage.removeItem("role");
+
+    navigate("/login");
+  };
+
   const navigate = useNavigate()
 
 
@@ -67,8 +76,8 @@ const ResumeUploadPage: React.FC = () => {
 
           {/* Left branding */}
           {/* Left */}
-          <button 
-            onClick={() => navigate("/home")}
+          <button
+            onClick={() => navigate("/login")}
             className="flex items-center gap-3 hover:opacity-80 transition-opacity"
           >
             <div className="w-10 h-10 rounded-xl bg-gradient-primary flex items-center justify-center">
@@ -83,14 +92,25 @@ const ResumeUploadPage: React.FC = () => {
           </button>
 
           {/* Right action */}
-          <button
-            onClick={() => navigate("/")}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg
-                 bg-gray-800 hover:bg-gray-700 text-white transition"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to Search
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => navigate("/login")}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg
+         bg-gray-800 hover:bg-gray-700 text-white transition"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to Home
+            </button>
+
+            <button
+              onClick={handleSignOut}
+              className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white transition"
+            >
+              Sign Out
+            </button>
+          </div>
+
+
 
         </div>
       </header>
@@ -99,11 +119,11 @@ const ResumeUploadPage: React.FC = () => {
 
         {/* Title */}
         <div className="text-center mb-8">
-  <h1 className="text-4xl font-bold mb-2">Apply for This Position</h1>
-  <p className="text-gray-400">
-    Upload your resume to submit your application. Our team will review it and contact you if there’s a match.
-  </p>
-</div>
+          <h1 className="text-4xl font-bold mb-2">Apply for This Position</h1>
+          <p className="text-gray-400">
+            Upload your resume to submit your application. Our team will review it and contact you if there’s a match.
+          </p>
+        </div>
 
 
         {/* Upload Card */}

@@ -1,224 +1,252 @@
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { 
-  Brain, 
-  Search, 
-  Users, 
-  Zap, 
-  FileText, 
+import {
+  Brain,
+  Search,
+  Users,
+  Zap,
+  FileText,
   ArrowRight,
   Sparkles,
   Database,
-  MessageSquare
+  MessageSquare,
 } from "lucide-react";
+import { supabase } from "../lib/supabaseClient";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
+
 
 const Home = () => {
+  const navigate = useNavigate();
+
+  const [open, setOpen] = useState(false);
+  const [role, setRole] = useState<"candidate" | "recruiter" | null>(null);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+
+
+  // 2️⃣ Optional: update role in backend and refresh session
+  const updateRole = async (role: "candidate" | "recruiter") => {
+    const { data: sessionData } = await supabase.auth.getSession();
+    if (!sessionData.session) return;
+
+    const res = await fetch("/api/update-role", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${sessionData.session.access_token}`,
+      },
+      body: JSON.stringify({ role }),
+    });
+
+    const data = await res.json();
+    console.log("Role updated:", data);
+
+    // Refresh user session to get updated metadata
+    await supabase.auth.getUser();
+  };
+
+  const handleAuth = async (expectedRole: "candidate" | "recruiter") => {
+    try {
+      // 1️⃣ Authenticate user (email + password)
+      const { error: signInError } =
+        await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+      if (signInError) {
+        setAlertMessage("Invalid email or password");
+        setShowAlert(true);
+        return;
+      }
+
+      // 2️⃣ Get logged-in user
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      console.log(user);
+      if (!user) {
+        setAlertMessage("Authentication failed");
+        setShowAlert(true);
+        return;
+      }
+
+      // 3️⃣ Fetch role from DB
+      const { data, error } = await supabase
+        .from("users")
+        .select("role")
+        .eq("id", user.id)
+        .single();
+
+      if (error || !data?.role) {
+        setAlertMessage("Role not found");
+        setShowAlert(true);
+        return;
+      }
+
+      // 4️⃣ 🔥 ROLE CHECK (THIS IS THE CORE)
+      if (data.role !== expectedRole) {
+        await supabase.auth.signOut();
+        setAlertMessage(`Access denied: You are not a ${expectedRole}`);
+        setShowAlert(true);
+        return;
+      }
+
+      // 5️⃣ Role matched → redirect
+      if (expectedRole === "candidate") navigate("/parse-resume");
+      if (expectedRole === "recruiter") navigate("/");
+
+      setOpen(false);
+    } catch (err) {
+      console.error(err);
+      setAlertMessage("Something went wrong");
+      setShowAlert(true);
+    }
+  };
+
+
+
+
+
   return (
     <div className="min-h-screen bg-background overflow-hidden">
       {/* Hero Section */}
       <section className="relative py-20 lg:py-32">
-        {/* Background Effects */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse" />
           <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-pulse delay-1000" />
         </div>
-        
+
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center max-w-4xl mx-auto">
-            {/* Logo/Brand */}
             <div className="inline-flex items-center gap-3 mb-8 px-4 py-2 bg-primary/10 rounded-full border border-primary/20">
               <Brain className="w-6 h-6 text-primary" />
               <span className="text-lg font-semibold text-primary">JobPilot</span>
             </div>
-            
-            {/* Main Headline */}
+
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6 leading-tight">
               AI-Powered
               <span className="block text-primary">Recruitment Platform</span>
             </h1>
-            
+
             <p className="text-lg md:text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">
-              Leveraging intelligent AI agents to connect the right candidates with the right opportunities. 
-              Natural language search meets advanced query generation.
+              Leveraging intelligent AI agents to connect the right candidates with the right opportunities.
             </p>
-            
-            {/* CTA Buttons */}
+
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Link to="/parse-resume">
-                <Button size="lg" className="group text-lg px-8 py-6 rounded-xl shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all">
-                  <FileText className="w-5 h-5 mr-2" />
-                  I'm a Candidate
-                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
-              
-              <Link to="/">
-                <Button size="lg" variant="outline" className="group text-lg px-8 py-6 rounded-xl border-2 hover:bg-primary hover:text-primary-foreground transition-all">
-                  <Search className="w-5 h-5 mr-2" />
-                  I'm an HR Professional
-                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
+              <Button
+                size="lg"
+                className="group text-lg px-8 py-6 rounded-xl"
+                onClick={() => {
+                  setRole("candidate");
+                  setOpen(true);
+                }}
+
+              >
+                I'm a Candidate
+              </Button>
+
+              <Button
+                size="lg"
+                variant="outline"
+                className="group text-lg px-8 py-6 rounded-xl"
+                onClick={() => {
+                  setRole("recruiter");
+                  setOpen(true);
+                }}
+
+              >
+                I'm an HR Professional
+              </Button>
+
             </div>
           </div>
-        </div>
-      </section>
+        </div >
+      </section >
 
       {/* Features Section */}
-      <section className="py-20 bg-muted/30">
+      < section className="py-20 bg-muted/30" >
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              How It Works
-            </h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">How It Works</h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
               Experience the future of recruitment with our AI-powered platform
             </p>
           </div>
-          
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Feature 1 */}
-            <div className="group p-8 bg-card rounded-2xl border border-border hover:border-primary/50 hover:shadow-lg transition-all duration-300">
-              <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
-                <MessageSquare className="w-7 h-7 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold text-foreground mb-3">Natural Language Search</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                Describe your ideal candidate in plain English. No complex filters or boolean queries needed.
-              </p>
-            </div>
-            
-            {/* Feature 2 */}
-            <div className="group p-8 bg-card rounded-2xl border border-border hover:border-primary/50 hover:shadow-lg transition-all duration-300">
-              <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
-                <Brain className="w-7 h-7 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold text-foreground mb-3">AI-Powered Queries</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                CrewAI agents intelligently generate SQL queries, understanding skills, experience, and requirements.
-              </p>
-            </div>
-            
-            {/* Feature 3 */}
-            <div className="group p-8 bg-card rounded-2xl border border-border hover:border-primary/50 hover:shadow-lg transition-all duration-300">
-              <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
-                <Zap className="w-7 h-7 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold text-foreground mb-3">Real-Time Updates</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                Watch the AI work with live progress updates via Server-Sent Events as it searches candidates.
-              </p>
-            </div>
-            
-            {/* Feature 4 */}
-            <div className="group p-8 bg-card rounded-2xl border border-border hover:border-primary/50 hover:shadow-lg transition-all duration-300">
-              <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
-                <Sparkles className="w-7 h-7 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold text-foreground mb-3">Semantic Understanding</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                The platform understands context, synonyms, and related skills for smarter matching.
-              </p>
-            </div>
-            
-            {/* Feature 5 */}
-            <div className="group p-8 bg-card rounded-2xl border border-border hover:border-primary/50 hover:shadow-lg transition-all duration-300">
-              <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
-                <Database className="w-7 h-7 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold text-foreground mb-3">Database Integration</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                Seamlessly integrated with your candidate database for instant, accurate results.
-              </p>
-            </div>
-            
-            {/* Feature 6 */}
-            <div className="group p-8 bg-card rounded-2xl border border-border hover:border-primary/50 hover:shadow-lg transition-all duration-300">
-              <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
-                <Users className="w-7 h-7 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold text-foreground mb-3">Rich Candidate Profiles</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                View detailed profiles with skills, experience, education, CGPA, and contact information.
-              </p>
-            </div>
+            {/* Add your feature cards here (MessageSquare, Brain, etc.) */}
           </div>
         </div>
-      </section>
+      </section >
 
-      {/* Example Queries Section */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Example Searches
-            </h2>
-            <p className="text-muted-foreground text-lg">
-              Just type what you're looking for
-            </p>
-          </div>
-          
-          <div className="max-w-3xl mx-auto space-y-4">
-            {[
-              "Find me backend developers with 3+ years of experience in Python",
-              "Show me frontend developers who know React and TypeScript",
-              "Find freshers with good CGPA interested in full-stack development"
-            ].map((query, index) => (
-              <div 
-                key={index}
-                className="p-5 bg-card rounded-xl border border-border hover:border-primary/30 transition-colors"
-              >
-                <div className="flex items-start gap-4">
-                  <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Search className="w-4 h-4 text-primary" />
-                  </div>
-                  <p className="text-foreground text-lg leading-relaxed">"{query}"</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="sm:max-w-md rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-center">
+              {role === "candidate" ? "Candidate Login" : "Recruiter Login"}
 
-      {/* CTA Section */}
-      <section className="py-20 bg-primary/5">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
-            Ready to Get Started?
-          </h2>
-          <p className="text-muted-foreground text-lg mb-10 max-w-xl mx-auto">
-            Whether you're looking for your next opportunity or searching for top talent, JobPilot has you covered.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/parse-resume">
-              <Button size="lg" className="text-lg px-8 py-6 rounded-xl">
-                <FileText className="w-5 h-5 mr-2" />
-                Submit Your Resume
-              </Button>
-            </Link>
-            
-            <Link to="/">
-              <Button size="lg" variant="outline" className="text-lg px-8 py-6 rounded-xl border-2">
-                <Search className="w-5 h-5 mr-2" />
-                Search Candidates
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
+            </DialogTitle>
+          </DialogHeader>
 
-      {/* Footer */}
-      <footer className="py-8 border-t border-border">
-        <div className="container mx-auto px-4 text-center">
-          <div className="flex items-center justify-center gap-2 text-muted-foreground">
-            <Brain className="w-5 h-5 text-primary" />
-            <span className="font-semibold">JobPilot</span>
-            <span className="text-sm">— AI-Powered Recruitment</span>
+          <div className="space-y-4 mt-4">
+            <Input
+              placeholder="Email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+
+            <Input
+              placeholder="Password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+
+            <Button
+              className="w-full text-lg py-6 rounded-xl"
+              onClick={() => role && handleAuth(role)}
+            >
+              Continue
+            </Button>
+
+
           </div>
-        </div>
-      </footer>
-    </div>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={showAlert} onOpenChange={setShowAlert}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Authentication Error</AlertDialogTitle>
+            <AlertDialogDescription>
+              {alertMessage}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogAction onClick={() => setShowAlert(false)}>OK</AlertDialogAction>
+        </AlertDialogContent>
+      </AlertDialog>
+
+    </div >
   );
 };
 

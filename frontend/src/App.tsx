@@ -1,31 +1,37 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Login from "./pages/Login";
+import Home from "@/pages/Home";
 import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
-import ResumeParserPage from "./pages/ResumeParserPage";
-import Home from "./pages/Home";
-
-const queryClient = new QueryClient();
+import ResumeParserPage from "@/pages/ResumeParserPage";
+import ProtectedRoute from "../routes/ProtectedRoute";
+import { AuthProvider } from "../context/AuthContext";
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/home" element={<Home />} />
-          <Route path="/" element={<Index />} />
-          <Route path="/parse-resume" element={<ResumeParserPage />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <AuthProvider>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+
+        <Route
+          path="/find-candidates"
+          element={
+            <ProtectedRoute allowedRole="recruiter">
+              <Index />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/parse-resume"
+          element={
+            <ProtectedRoute allowedRole="candidate">
+              <ResumeParserPage />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </BrowserRouter>
+  </AuthProvider>
 );
 
 export default App;
