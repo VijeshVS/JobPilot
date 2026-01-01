@@ -21,7 +21,7 @@ export function CandidateCard({ candidate, index, onClick }: CandidateCardProps)
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-full gradient-primary flex items-center justify-center">
               <span className="text-primary-foreground font-semibold text-lg">
-                {candidate.name.split(' ').map(n => n[0]).join('')}
+                {candidate.name.split(' ').slice(0,2).map(n => n[0]).join('')}
               </span>
             </div>
             <div>

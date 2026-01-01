@@ -8,11 +8,9 @@ import { AILoadingOverlay } from '@/components/AILoadingOverlay';
 import { WorkflowReviewModal } from '@/components/WorkflowReviewModal';
 import { CandidateDetailsModal } from '@/components/CandidateDetailsModal';
 import { Candidate, CandidateDetails } from '@/types/candidate';
-import { mockCandidates } from '@/data/mockCandidates';
 import { useSSEEvents } from '@/hooks/useSSEEvents';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
-import ResumeParser from "@/components/ResumeParser";
 import { useNavigate } from "react-router-dom"
 
 const Index = () => {
@@ -35,9 +33,7 @@ const Index = () => {
       });
 
       const data = await response.json();
-      console.log(data);
-      const results = JSON.parse(data.result).candidates;
-      console.log(results);
+      const results = data.result == "null" ? [] : JSON.parse(data.result);
       setCandidates(results);
       setIsLoading(false);
 

@@ -1,9 +1,38 @@
 sql_query_task:
   description: >
-    Analyze the user's request, determine whether a SQL query or RPC call
-    is required, construct the exact query or parameters using the available
-    tools, and execute the operation without assumptions or guesses.
-    User request: {user_query}
+    Based on the user query, generate the optimized SQL query which returns 
+    the list of candidates.
+
+    User query: {user_query}
+    
+    IMPORTANT RULES:
+
+    1. Before executing any SQL queries, ensure you fully understand which tables are available. If needed, obtain the table schema for additional context using the provided tools.
+    
+    2. (**Important Step**) When applying filters using WHERE, IN, or LIKE, the agent must not assume or invent filter 
+    keywords directly from the user's text. Instead, it must:
+
+      2a. Identify all distinct values from the relevant column(s) in the database (e.g., SELECT DISTINCT column FROM table).
+      
+      2b. Determine which of these values are semantically closest to the user's request (based on meaning, not substring matching).
+      
+      2c. Apply the filter only using those existing distinct values, not fabricated or guessed ones.
+      
+      2d. The filter must use **only actual distinct values** already present in the database.
+      
+      2e. Never invent or assume keywords that do not exist in the column.
+      
+      2f. All keyword filtering must be case-sensitive.
+    
+    3. When querying through the tool to explore or retrieve candidates records, *strictly* you must always apply 
+    LIMIT <= 15 to prevent fetching excessive data.
+    
+    4. The query must be strictly read-only — no INSERT, UPDATE, DELETE, TRUNCATE, or any operation 
+    that modifies data. Only retrieval is allowed.
+    
+    5. Use DISTINCT in SELECT when joins could cause duplicates.
+
+    6. Output only the raw SQL query. Do not include backticks, code blocks, formatting, explanations, or any other text.
   expected_output: >
-    List of candidates
+    Output only the raw SQL query. Do not include backticks, code blocks, formatting, explanations, or any other text.
   agent: sql_expert
