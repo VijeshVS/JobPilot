@@ -12,6 +12,8 @@ from pathlib import Path
 import shutil
 from supabase import create_client, Client
 from dotenv import load_dotenv
+from datetime import datetime
+from typing import Optional
 
 load_dotenv()
 app = FastAPI()
@@ -45,6 +47,18 @@ class CompleteRequest(BaseModel):
 class CandidateByUSNRequest(BaseModel):
     usn: str
 
+class InterviewData(BaseModel):
+    title: str
+    role: str
+    ctc: Optional[str] = None
+    interview_date: Optional[datetime] = None
+    mode: str = "online"  # 'online' or 'offline'
+    notes: Optional[str] = None
+
+class ShortlistData(BaseModel):
+    interview: InterviewData
+    candidate_ids: List[int]  # candidate_id from your candidates table
+    
 @app.post("/complete")
 def complete(req: CompleteRequest):
     try:
@@ -59,7 +73,7 @@ def complete(req: CompleteRequest):
             ["crewai", "run"],
             cwd=SQL_BASE_DIR,
             check=True,
-            capture_output=True,
+            # capture_output=True,
             text=True,
             timeout=300
         )
@@ -202,3 +216,41 @@ def get_candidate_by_usn(req: CandidateByUSNRequest):
     )
 
     return response.data
+
+@app.post("/interviews/shortlist")
+def create_interview_and_shortlist(req: ShortlistData):
+    # 1️⃣ Insert interview
+    interview_payload = {
+        "title": req.interview.title,
+        "role": req.interview.role,
+        "ctc": req.interview.ctc,
+        "interview_date": req.interview.interview_date.isoformat() if req.interview.interview_date else None,
+        "mode": req.interview.mode,
+        "notes": req.interview.notes
+    }
+
+    # Insert interview
+    insert_resp = supabase.from_("interviews").insert(interview_payload).execute()
+
+    # # ✅ Check for errors using status_code
+    # if insert_resp.status_code != 201:
+    #     raise HTTPException(status_code=500, detail=f"Failed to create interview: {insert_resp.data}")
+
+    # The inserted row's ID is in data[0]
+    interview_id = insert_resp.data[0]["interview_id"]
+
+    # 2️⃣ Insert shortlist entries
+    shortlist_rows = [
+        {"candidate_id": cid, "interview_id": interview_id} for cid in req.candidate_ids
+    ]
+
+    shortlist_resp = supabase.from_("shortlists").insert(shortlist_rows).execute()
+
+    # if shortlist_resp.status_code != 201:
+    #     raise HTTPException(status_code=500, detail=f"Failed to create shortlists: {shortlist_resp.data}")
+
+    return {
+        "status": "success",
+        "interview_id": interview_id,
+        "shortlisted_count": len(shortlist_rows)
+    }

@@ -1,13 +1,13 @@
 from crewai.tools import BaseTool
 from typing import Type
 from pydantic import BaseModel, Field
-from supabase import create_client, Client
-import os
 import json
 import re
+from supabase import create_client, Client
+import os
 
-url: str = os.environ.get("SUPABASE_URL")
-key: str = os.environ.get("SUPABASE_KEY")
+url: str = os.environ.get("SUPABASE_URL") # type:ignore
+key: str = os.environ.get("SUPABASE_KEY") # type:ignore
 supabase: Client = create_client(url, key)
 
 def normalize_sql(query: str) -> str:

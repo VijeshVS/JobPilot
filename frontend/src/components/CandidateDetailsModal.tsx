@@ -54,6 +54,7 @@ export function CandidateDetailsModal({
   candidate,
   isLoading,
 }: CandidateDetailsModalProps) {
+  console.log(candidate);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col p-0">

@@ -39,6 +39,10 @@ const Index = () => {
       const results = JSON.parse(data.result).candidates;
       console.log(results);
       setCandidates(results);
+
+      localStorage.setItem("candidates", JSON.stringify(results));
+
+
       setIsLoading(false);
 
       toast({
@@ -73,6 +77,9 @@ const Index = () => {
     // Small delay to ensure previous connection is closed
     setTimeout(() => connect(prompt), 100);
     fetchCandidates(prompt);
+
+    const storedCandidates = JSON.parse(localStorage.getItem("candidates") || "[]");
+    console.log(storedCandidates);
   };
 
   const handleCancel = () => {
@@ -110,11 +117,13 @@ const Index = () => {
         body: JSON.stringify({ usn: candidate.usn }),
       });
 
+
       if (!response.ok) {
         throw new Error('Failed to fetch candidate details');
       }
 
       const data: CandidateDetails = await response.json();
+      console.log(data);
       setSelectedCandidateDetails(data);
     } catch (error) {
       console.error('Error fetching candidate details:', error);
@@ -224,6 +233,16 @@ const Index = () => {
               isLoading={false}
               onCandidateClick={handleCandidateClick}
             />
+          </div>
+        )}
+        {candidates.length > 0 && (
+          <div className="flex justify-center mb-6">
+            <Button
+              onClick={() => navigate("/shortlist-candidates")}
+              className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
+            >
+              Shortlist Candidates
+            </Button>
           </div>
         )}
 

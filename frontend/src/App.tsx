@@ -5,6 +5,7 @@ import Index from "./pages/Index";
 import ResumeParserPage from "@/pages/ResumeParserPage";
 import ProtectedRoute from "../routes/ProtectedRoute";
 import { AuthProvider } from "../context/AuthContext";
+import ShortlistedCandidates from "@/pages/ShortlistedCandidates";
 
 const App = () => (
   <AuthProvider>
@@ -15,20 +16,30 @@ const App = () => (
         <Route
           path="/find-candidates"
           element={
-            <ProtectedRoute allowedRole="recruiter">
-              <Index />
-            </ProtectedRoute>
+            // <ProtectedRoute allowedRole="recruiter">
+            <Index />
+            // </ProtectedRoute>
           }
         />
 
         <Route
           path="/parse-resume"
           element={
-            <ProtectedRoute allowedRole="candidate">
-              <ResumeParserPage />
-            </ProtectedRoute>
+            // <ProtectedRoute allowedRole="candidate">
+            <ResumeParserPage />
+            // </ProtectedRoute>
           }
         />
+
+        <Route
+          path="/shortlist-candidates"
+          element={
+            // <ProtectedRoute allowedRole="recruiter">
+            <ShortlistedCandidates />
+            // </ProtectedRoute>
+          }
+        />
+
       </Routes>
     </BrowserRouter>
   </AuthProvider>
