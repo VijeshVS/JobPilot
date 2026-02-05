@@ -6,12 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Brain } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
+import { useAuth } from "../../context/AuthContext";
 
 type Role = "candidate" | "recruiter";
 
 export default function LoginPage() {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
+    const { updateAuth } = useAuth();
 
     // UI States
     const [isLogin, setIsLogin] = useState(true);
@@ -99,6 +101,9 @@ export default function LoginPage() {
             localStorage.setItem("isAuthenticated", "true");
             localStorage.setItem("role", userData.role);
             localStorage.setItem("userId", userId);
+
+            // Update auth context immediately
+            updateAuth(true, userData.role);
 
             toast.success(`Welcome back, ${userData.role}!`);
 

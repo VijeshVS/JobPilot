@@ -11,9 +11,11 @@ import { Candidate, CandidateDetails } from '@/types/candidate';
 import { useSSEEvents } from '@/hooks/useSSEEvents';
 import { toast } from '@/components/ui/sonner';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom";
+import { useAuth } from '../../context/AuthContext';
 
 const Index = () => {
+  const { updateAuth } = useAuth();
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
@@ -73,6 +75,9 @@ const Index = () => {
 
     localStorage.removeItem("isAuthenticated");
     localStorage.removeItem("role");
+    
+    // Update auth context
+    updateAuth(false, null);
 
     toast.success("You have been successfully signed out");
 

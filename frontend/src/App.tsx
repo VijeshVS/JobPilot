@@ -17,7 +17,9 @@ const App = () => (
         <Route
           path="/find-candidates"
           element={
-            <Index/>
+            <ProtectedRoute allowedRole="recruiter">
+              <Index />
+            </ProtectedRoute>
           }
         />
 

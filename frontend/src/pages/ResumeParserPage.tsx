@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom"
 import { supabase } from "../lib/supabaseClient";
 import { toast } from "@/components/ui/sonner";
 import { Button } from '@/components/ui/button';
+import { useAuth } from '../../context/AuthContext';
 
 type ProcessStep = {
   label: string;
@@ -13,6 +14,7 @@ type ProcessStep = {
 };
 
 const ResumeUploadPage: React.FC = () => {
+  const { updateAuth } = useAuth();
   const [resumeFile, setResumeFile] = useState<File | null>(null)
   const [result, setResult] = useState<{
     present_skills: string[]
@@ -111,6 +113,9 @@ const ResumeUploadPage: React.FC = () => {
 
     localStorage.removeItem("isAuthenticated");
     localStorage.removeItem("role");
+    
+    // Update auth context
+    updateAuth(false, null);
 
     toast.success('You have been successfully signed out');
 
