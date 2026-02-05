@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
 import { Input } from '../components/ui/input'
 import { Card, CardContent } from '../components/ui/card'
-import { Upload, Plane, ArrowLeft } from 'lucide-react'
+import { Upload, Briefcase, ArrowLeft, LogOut } from 'lucide-react'
 import { useNavigate } from "react-router-dom"
 import { supabase } from "../lib/supabaseClient";
+import { toast } from "@/components/ui/sonner";
+import { Button } from '@/components/ui/button';
 
 const ResumeUploadPage: React.FC = () => {
   const [resumeFile, setResumeFile] = useState<File | null>(null)
@@ -14,23 +16,26 @@ const ResumeUploadPage: React.FC = () => {
   } | null>(null)
 
   const [loading, setLoading] = useState<boolean>(false)
-  const [error, setError] = useState<string | null>(null)
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
-      setResumeFile(event.target.files[0])
-      setError(null)
+      const file = event.target.files[0]
+      if (file.type !== 'application/pdf') {
+        toast.error('Please upload a PDF file');
+        return;
+      }
+      setResumeFile(file)
+      toast.success(`File selected: ${file.name}`);
     }
   }
 
   const handleSubmit = async () => {
     if (!resumeFile) {
-      setError('Please upload a resume PDF.')
+      toast.error('Please upload a resume PDF');
       return
     }
 
     setLoading(true)
-    setError(null)
     setResult(null)
 
     const formData = new FormData()
@@ -49,8 +54,10 @@ const ResumeUploadPage: React.FC = () => {
 
       const data = await response.json()
       setResult(data)
-    } catch (err) {
-      setError(err.message || 'Something went wrong')
+      toast.success(`Resume parsed successfully! Found ${data.count_skills} matching skills`);
+    } catch (err: any) {
+      console.error('Resume parsing error:', err);
+      toast.error(err.message || 'Failed to parse resume');
     } finally {
       setLoading(false)
     }
@@ -61,6 +68,8 @@ const ResumeUploadPage: React.FC = () => {
 
     localStorage.removeItem("isAuthenticated");
     localStorage.removeItem("role");
+
+    toast.success('You have been successfully signed out');
 
     navigate("/login");
   };
@@ -77,11 +86,11 @@ const ResumeUploadPage: React.FC = () => {
           {/* Left branding */}
           {/* Left */}
           <button
-            onClick={() => navigate("/login")}
+            onClick={() => navigate("/")}
             className="flex items-center gap-3 hover:opacity-80 transition-opacity"
           >
             <div className="w-10 h-10 rounded-xl bg-gradient-primary flex items-center justify-center">
-              <Plane className="w-5 h-5 text-primary-foreground" />
+              <Briefcase className="w-5 h-5 text-primary-foreground" />
             </div>
             <div className="text-left">
               <h1 className="text-xl font-bold text-foreground">Job Pilot</h1>
@@ -93,21 +102,14 @@ const ResumeUploadPage: React.FC = () => {
 
           {/* Right action */}
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate("/login")}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg
-         bg-gray-800 hover:bg-gray-700 text-white transition"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back to Home
-            </button>
-
-            <button
+            <Button
               onClick={handleSignOut}
-              className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white transition"
+              variant="outline"
+              className="group gap-2 hover:bg-destructive hover:text-destructive-foreground hover:border-destructive transition-all"
             >
+              <LogOut className="w-4 h-4 group-hover:rotate-12 transition-transform" />
               Sign Out
-            </button>
+            </Button>
           </div>
 
 
@@ -157,13 +159,6 @@ const ResumeUploadPage: React.FC = () => {
                 ? `✔ ${resumeFile.name} selected`
                 : 'No file selected'}
             </p>
-
-            {/* Error */}
-            {error && (
-              <p className="mt-3 text-red-400 text-sm">
-                {error}
-              </p>
-            )}
 
             {/* Button */}
             <button

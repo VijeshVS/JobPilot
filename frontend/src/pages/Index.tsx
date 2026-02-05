@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { FileSearch, ArrowLeft } from 'lucide-react';
-import { Plane, FileUp } from 'lucide-react';
+import { FileSearch, ArrowLeft, LogOut } from 'lucide-react';
+import { Briefcase, FileUp } from 'lucide-react';
 import { supabase } from "../lib/supabaseClient";
 import { SearchPrompt } from '@/components/SearchPrompt';
 import { CandidateGrid } from '@/components/CandidateGrid';
@@ -9,7 +9,7 @@ import { WorkflowReviewModal } from '@/components/WorkflowReviewModal';
 import { CandidateDetailsModal } from '@/components/CandidateDetailsModal';
 import { Candidate, CandidateDetails } from '@/types/candidate';
 import { useSSEEvents } from '@/hooks/useSSEEvents';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from '@/components/ui/sonner';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from "react-router-dom"
 
@@ -22,7 +22,6 @@ const Index = () => {
   const [selectedCandidateDetails, setSelectedCandidateDetails] = useState<CandidateDetails | null>(null);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
   const { events, isConnected, isComplete, connect, disconnect, resetEvents } = useSSEEvents();
-  const { toast } = useToast();
 
   const fetchCandidates = async (prompt: string) => {
     try {
@@ -37,17 +36,10 @@ const Index = () => {
       setCandidates(results);
       setIsLoading(false);
 
-      toast({
-        title: "Candidates Found",
-        description: `Found ${results.length} matching candidates`,
-      });
+      toast.success(`Found ${results.length} matching candidates`);
     } catch (error) {
       console.error('Error fetching candidates:', error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch candidates",
-        variant: "destructive",
-      });
+      toast.error("Failed to fetch candidates");
     } finally {
       setIsLoading(false);
     }
@@ -82,16 +74,14 @@ const Index = () => {
     localStorage.removeItem("isAuthenticated");
     localStorage.removeItem("role");
 
+    toast.success("You have been successfully signed out");
+
     navigate("/login");
   };
 
   const handleCandidateClick = async (candidate: Candidate) => {
     if (!candidate.usn) {
-      toast({
-        title: "Cannot fetch details",
-        description: "Candidate USN is not available",
-        variant: "destructive",
-      });
+      toast.error("Candidate USN is not available");
       return;
     }
 
@@ -114,11 +104,7 @@ const Index = () => {
       setSelectedCandidateDetails(data);
     } catch (error) {
       console.error('Error fetching candidate details:', error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch candidate details",
-        variant: "destructive",
-      });
+      toast.error("Failed to fetch candidate details");
       setShowCandidateDetails(false);
     } finally {
       setIsLoadingDetails(false);
@@ -135,11 +121,11 @@ const Index = () => {
 
           {/* Left */}
           <button
-            onClick={() => navigate("/login")}
+            onClick={() => navigate("/")}
             className="flex items-center gap-3 hover:opacity-80 transition-opacity"
           >
             <div className="w-10 h-10 rounded-xl bg-gradient-primary flex items-center justify-center">
-              <Plane className="w-5 h-5 text-primary-foreground" />
+              <Briefcase className="w-5 h-5 text-primary-foreground" />
             </div>
             <div className="text-left">
               <h1 className="text-xl font-bold text-foreground">Job Pilot</h1>
@@ -151,21 +137,14 @@ const Index = () => {
 
           {/* Right Button */}
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate("/login")}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg
-         bg-blue-600 hover:bg-blue-700 text-white transition"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back to Home
-            </button>
-
-            <button
+            <Button
               onClick={handleSignOut}
-              className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white transition"
+              variant="outline"
+              className="group gap-2 hover:bg-destructive hover:text-destructive-foreground hover:border-destructive transition-all"
             >
+              <LogOut className="w-4 h-4 group-hover:rotate-12 transition-transform" />
               Sign Out
-            </button>
+            </Button>
           </div>
 
 

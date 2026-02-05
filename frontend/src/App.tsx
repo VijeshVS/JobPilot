@@ -1,15 +1,17 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
-import Home from "@/pages/Home";
+import Landing from "@/pages/Landing";
 import Index from "./pages/Index";
 import ResumeParserPage from "@/pages/ResumeParserPage";
 import ProtectedRoute from "../routes/ProtectedRoute";
 import { AuthProvider } from "../context/AuthContext";
+import { Toaster } from "@/components/ui/sonner";
 
 const App = () => (
   <AuthProvider>
     <BrowserRouter>
       <Routes>
+        <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
 
         <Route
@@ -28,6 +30,7 @@ const App = () => (
           }
         />
       </Routes>
+      <Toaster />
     </BrowserRouter>
   </AuthProvider>
 );
