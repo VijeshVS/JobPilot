@@ -144,6 +144,81 @@ export function AILoadingOverlay({ events, isConnected, onCancel }: AILoadingOve
     }
   };
 
+  const formatDetails = (details: string): React.ReactNode => {
+    if (!details || details.trim() === '') {
+      return <p className="text-sm text-muted-foreground italic">No details available</p>;
+    }
+
+    // Try to parse as JSON for better formatting
+    try {
+      const parsed = JSON.parse(details);
+      
+      // If it's an object or array, format it nicely
+      if (typeof parsed === 'object' && parsed !== null) {
+        return (
+          <div className="text-sm space-y-2">
+            {Array.isArray(parsed) ? (
+              <div className="space-y-1">
+                {parsed.map((item, idx) => (
+                  <div key={idx} className="bg-muted/50 rounded p-2 border border-border/50">
+                    <pre className="text-xs text-foreground whitespace-pre-wrap break-words font-mono leading-relaxed">
+                      {typeof item === 'object' ? JSON.stringify(item, null, 2) : String(item)}
+                    </pre>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-1">
+                {Object.entries(parsed).map(([key, value]) => (
+                  <div key={key} className="flex flex-col gap-1">
+                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                      {key.replace(/_/g, ' ')}
+                    </span>
+                    <div className="bg-muted/50 rounded p-2 border border-border/50">
+                      <pre className="text-sm text-foreground whitespace-pre-wrap break-words leading-relaxed">
+                        {typeof value === 'object' 
+                          ? JSON.stringify(value, null, 2) 
+                          : String(value)}
+                      </pre>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      }
+      
+      // If it's a primitive value
+      return (
+        <p className="text-sm text-foreground whitespace-pre-wrap break-words leading-relaxed">
+          {String(parsed)}
+        </p>
+      );
+    } catch {
+      // Not JSON, check if it contains newlines or is long text
+      const lines = details.split('\n');
+      
+      if (lines.length > 1) {
+        // Multi-line text
+        return (
+          <div className="bg-muted/50 rounded p-3 border border-border/50">
+            <pre className="text-sm text-foreground whitespace-pre-wrap break-words font-mono leading-relaxed">
+              {details}
+            </pre>
+          </div>
+        );
+      }
+      
+      // Single line text
+      return (
+        <p className="text-sm text-foreground whitespace-pre-wrap break-words leading-relaxed">
+          {details}
+        </p>
+      );
+    }
+  };
+
   const EventChip = ({ event }: { event: ActiveEvent }) => {
     const Icon = getEventIcon(event.type);
     const colors = getEventColor(event.type);
@@ -221,11 +296,7 @@ export function AILoadingOverlay({ events, isConnected, onCancel }: AILoadingOve
               </div>
             </DialogHeader>
             <div className="flex-1 overflow-auto mt-4">
-              <div className="bg-muted/50 rounded-lg p-4 border border-border/50">
-                <pre className="text-sm text-foreground whitespace-pre-wrap break-words font-mono leading-relaxed">
-                  {selectedEvent.details}
-                </pre>
-              </div>
+              {formatDetails(selectedEvent.details || '')}
             </div>
           </>
         )}

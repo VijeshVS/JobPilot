@@ -21,6 +21,7 @@ export default function LoginPage() {
     const [companyName, setCompanyName] = useState("");
     const [companyRole, setCompanyRole] = useState("");
     const [loading, setLoading] = useState(false);
+    const [checkingAuth, setCheckingAuth] = useState(true);
 
     // Check if user is already logged in
     useEffect(() => {
@@ -30,11 +31,12 @@ export default function LoginPage() {
             const userRole = localStorage.getItem("role");
 
             if (session && isAuthenticated === "true" && userRole) {
-                toast.success("Already logged in! Redirecting to your dashboard...");
+                setCheckingAuth(false);
+                toast.success("Already logged in !!!");
                 
-                setTimeout(() => {
-                    navigate(userRole === "candidate" ? "/parse-resume" : "/find-candidates");
-                }, 500);
+                navigate(userRole === "candidate" ? "/parse-resume" : "/find-candidates", { replace: true });
+            } else {
+                setCheckingAuth(false);
             }
         };
 
@@ -100,10 +102,10 @@ export default function LoginPage() {
 
             toast.success(`Welcome back, ${userData.role}!`);
 
-            // Small delay to show toast before navigation
-            setTimeout(() => {
-                navigate(userData.role === "candidate" ? "/parse-resume" : "/find-candidates");
-            }, 500);
+            setLoading(false);
+            
+            // Navigate with replace to prevent back navigation issues
+            navigate(userData.role === "candidate" ? "/parse-resume" : "/find-candidates", { replace: true });
         } catch (err) {
             console.error("Login error:", err);
             toast.error("An unexpected error occurred");
@@ -175,6 +177,18 @@ export default function LoginPage() {
             setLoading(false);
         }
     };
+
+    // Show loading screen while checking authentication
+    if (checkingAuth) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-secondary/20">
+                <div className="text-center space-y-4">
+                    <div className="w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto" />
+                    <p className="text-lg text-muted-foreground">Checking authentication...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-background overflow-x-hidden flex items-center justify-center p-4">

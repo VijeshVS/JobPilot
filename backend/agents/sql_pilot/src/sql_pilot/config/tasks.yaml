@@ -35,7 +35,7 @@ sql_query_task:
     
     5. Use DISTINCT in SELECT when joins could cause duplicates.
 
-    6. Output only the raw SQL query. The sql query must strictly get all the attributes of the candidates. Do not include backticks, code blocks, formatting, explanations, or any other text.
+    6. Output only the raw SQL query. The sql query must strictly get all the attributes of the candidates table. Do not include backticks, code blocks, formatting, explanations, or any other text.
   expected_output: >
     Output only the raw SQL query. Do not include backticks, code blocks, formatting, explanations, or any other text.
   agent: sql_expert

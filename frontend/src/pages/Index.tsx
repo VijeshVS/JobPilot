@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FileSearch, ArrowLeft, LogOut } from 'lucide-react';
+import { FileSearch, ArrowLeft, LogOut, Sparkles } from 'lucide-react';
 import { Briefcase, FileUp } from 'lucide-react';
 import { supabase } from "../lib/supabaseClient";
 import { SearchPrompt } from '@/components/SearchPrompt';
@@ -153,14 +153,18 @@ const Index = () => {
 
 
       {/* Main Content */}
-      <main className="container mx-auto px-6 py-12">
+      <main className="container mx-auto px-6 py-16">
         {/* Search Section */}
-        <div className="max-w-3xl mx-auto mb-12">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-foreground mb-3">
+        <div className="max-w-4xl mx-auto mb-16">
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center gap-2 mb-4 px-4 py-1.5 bg-primary/10 rounded-full border border-primary/20">
+              <Sparkles className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium text-primary">AI-Powered Search</span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
               Find Your Perfect Candidates
             </h2>
-            <p className="text-muted-foreground">
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Describe the ideal candidate and let our AI agents search through the talent pool
             </p>
           </div>

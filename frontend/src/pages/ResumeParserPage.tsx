@@ -1,11 +1,16 @@
 import React, { useState } from 'react'
 import { Input } from '../components/ui/input'
 import { Card, CardContent } from '../components/ui/card'
-import { Upload, Briefcase, ArrowLeft, LogOut } from 'lucide-react'
+import { Upload, Briefcase, ArrowLeft, LogOut, CheckCircle2, Loader2, Github, FileText, Sparkles } from 'lucide-react'
 import { useNavigate } from "react-router-dom"
 import { supabase } from "../lib/supabaseClient";
 import { toast } from "@/components/ui/sonner";
 import { Button } from '@/components/ui/button';
+
+type ProcessStep = {
+  label: string;
+  status: 'pending' | 'processing' | 'completed';
+};
 
 const ResumeUploadPage: React.FC = () => {
   const [resumeFile, setResumeFile] = useState<File | null>(null)
@@ -16,6 +21,14 @@ const ResumeUploadPage: React.FC = () => {
   } | null>(null)
 
   const [loading, setLoading] = useState<boolean>(false)
+  const [processingSteps, setProcessingSteps] = useState<ProcessStep[]>([
+    { label: 'Parsing resume...', status: 'pending' },
+    { label: 'Extracting features...', status: 'pending' },
+    { label: 'Analyzing skills...', status: 'pending' },
+    { label: 'Matching skills with GitHub...', status: 'pending' },
+    { label: 'Comparing skills...', status: 'pending' },
+    { label: 'Compiling final results...', status: 'pending' },
+  ])
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
@@ -38,14 +51,41 @@ const ResumeUploadPage: React.FC = () => {
     setLoading(true)
     setResult(null)
 
+    // Reset all steps to pending
+    const resetSteps = processingSteps.map(step => ({ ...step, status: 'pending' as const }));
+    setProcessingSteps(resetSteps);
+
+    // Simulate progressive step updates
+    const stepTimings = [800, 1200, 1000, 1500, 1000, 800]; // ms for each step
+
     const formData = new FormData()
     formData.append('file', resumeFile)
 
     try {
-      const response = await fetch('http://localhost:8000/parse-resume', {
+      // Start the API call
+      const responsePromise = fetch('http://localhost:8000/parse-resume', {
         method: 'POST',
         body: formData
-      })
+      });
+
+      // Animate through steps while waiting for response
+      for (let i = 0; i < processingSteps.length; i++) {
+        // Mark current step as processing
+        setProcessingSteps(prev => prev.map((step, idx) => 
+          idx === i ? { ...step, status: 'processing' as const } : step
+        ));
+
+        // Wait for step duration
+        await new Promise(resolve => setTimeout(resolve, stepTimings[i]));
+
+        // Mark current step as completed
+        setProcessingSteps(prev => prev.map((step, idx) => 
+          idx === i ? { ...step, status: 'completed' as const } : step
+        ));
+      }
+
+      // Wait for API response
+      const response = await responsePromise;
 
       if (!response.ok) {
         const err = await response.json()
@@ -58,6 +98,8 @@ const ResumeUploadPage: React.FC = () => {
     } catch (err: any) {
       console.error('Resume parsing error:', err);
       toast.error(err.message || 'Failed to parse resume');
+      // Reset steps on error
+      setProcessingSteps(prev => prev.map(step => ({ ...step, status: 'pending' as const })));
     } finally {
       setLoading(false)
     }
@@ -137,11 +179,13 @@ const ResumeUploadPage: React.FC = () => {
               htmlFor="resume-upload"
               className="flex flex-col items-center justify-center border-2 border-dashed border-gray-700 rounded-lg h-48 cursor-pointer hover:border-green-500 transition"
             >
-              <Upload className="h-10 w-10 text-gray-400 mb-2" />
-              <p className="text-gray-300 font-medium">
+              <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <Upload className="h-8 w-8 text-primary" />
+              </div>
+              <p className="text-foreground font-semibold text-lg mb-1">
                 Drop your resume here
               </p>
-              <p className="text-gray-500 text-sm">
+              <p className="text-muted-foreground text-sm">
                 or click to browse (PDF only)
               </p>
 
@@ -154,63 +198,128 @@ const ResumeUploadPage: React.FC = () => {
               />
             </label>
 
-            <p className="text-sm text-gray-400 mt-2">
-              {resumeFile
-                ? `✔ ${resumeFile.name} selected`
-                : 'No file selected'}
-            </p>
+            <div className="flex items-center gap-2 mt-4">
+              {resumeFile && <CheckCircle2 className="w-4 h-4 text-green-500" />}
+              <p className="text-sm text-muted-foreground">
+                {resumeFile
+                  ? `${resumeFile.name} selected`
+                  : 'No file selected'}
+              </p>
+            </div>
 
             {/* Button */}
-            <button
+            <Button
               onClick={handleSubmit}
-              disabled={loading}
-              className={`mt-6 px-6 py-2 rounded transition-all flex items-center gap-2
-              ${loading
-                  ? 'bg-gray-600 cursor-not-allowed'
-                  : 'bg-blue-600 hover:bg-blue-700'}
-            `}
+              disabled={loading || !resumeFile}
+              size="lg"
+              className="mt-8 w-full py-7 text-base font-semibold shadow-lg hover:shadow-2xl transition-all duration-300 rounded-xl relative overflow-hidden group"
             >
-              {loading && <span className="loader" />}
-              {loading ? 'Processing.....' : 'Apply'}
-            </button>
+              <div className="flex items-center justify-center gap-3 relative z-10">
+                {loading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <span>Processing...</span>
+                  </>
+                ) : (
+                  <>
+                    <FileText className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
+                    <span>Analyze Resume</span>
+                  </>
+                )}
+              </div>
+            </Button>
+
+            {/* Processing Steps */}
+            {loading && (
+              <div className="mt-10 space-y-3 animate-fadeIn">
+                <div className="flex items-center gap-2 mb-5">
+                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <Sparkles className="w-4 h-4 text-primary" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-foreground">AI Agents Processing</h3>
+                </div>
+                
+                {processingSteps.map((step, idx) => (
+                  <div 
+                    key={idx}
+                    className={`flex items-center gap-3 p-4 rounded-xl transition-all duration-300 ${
+                      step.status === 'processing' 
+                        ? 'bg-primary/10 border-2 border-primary/30 shadow-lg' 
+                        : step.status === 'completed'
+                        ? 'bg-green-500/10 border-2 border-green-500/30'
+                        : 'bg-card/30 border-2 border-border/30'
+                    }`}
+                  >
+                    {step.status === 'processing' && (
+                      <Loader2 className="w-5 h-5 text-primary animate-spin" />
+                    )}
+                    {step.status === 'completed' && (
+                      <CheckCircle2 className="w-5 h-5 text-green-500" />
+                    )}
+                    {step.status === 'pending' && (
+                      <div className="w-5 h-5 rounded-full border-2 border-border" />
+                    )}
+                    <span className={`font-medium ${
+                      step.status === 'processing' 
+                        ? 'text-primary' 
+                        : step.status === 'completed'
+                        ? 'text-green-500'
+                        : 'text-muted-foreground'
+                    }`}>
+                      {step.label}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
 
             {/* Result Section */}
-            {result && (
-              <div className="mt-8 bg-gray-800 rounded-lg p-6 animate-fadeIn">
+            {result && !loading && (
+              <div className="mt-10 bg-gradient-to-br from-card to-card/50 border-2 border-border/50 rounded-2xl p-8 shadow-xl animate-fadeIn">
 
-                <h2 className="text-xl font-semibold mb-4">
-                  Skill Match Summary
-                </h2>
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center">
+                    <CheckCircle2 className="w-6 h-6 text-green-500" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-foreground">
+                    Skill Match Summary
+                  </h2>
+                </div>
 
                 {/* Percentage */}
-                <div className="mb-4">
-                  <div className="flex justify-between text-sm mb-1">
-                    <span>Match Percentage</span>
-                    <span>{result.percentage_score.toFixed(2)}%</span>
+                <div className="mb-6 p-6 bg-card/50 rounded-xl border border-border/30">
+                  <div className="flex justify-between text-sm mb-3">
+                    <span className="font-semibold text-foreground">Match Percentage</span>
+                    <span className="text-2xl font-bold text-primary">{result.percentage_score.toFixed(2)}%</span>
                   </div>
-                  <div className="w-full bg-gray-700 rounded-full h-3">
+                  <div className="w-full bg-border/30 rounded-full h-4 overflow-hidden">
                     <div
-                      className="bg-green-500 h-3 rounded-full transition-all"
+                      className="bg-gradient-to-r from-green-500 to-green-400 h-4 rounded-full transition-all duration-1000 shadow-lg shadow-green-500/30"
                       style={{ width: `${result.percentage_score.toFixed(2)}%` }}
                     />
                   </div>
                 </div>
 
                 {/* Count */}
-                <p className="text-gray-300 mb-4">
-                  Skills Matched: <span className="font-bold">{result.count_skills}</span>
-                </p>
+                <div className="mb-6 p-5 bg-primary/5 rounded-xl border border-primary/20">
+                  <p className="text-foreground text-lg">
+                    Skills Matched: <span className="font-bold text-2xl text-primary ml-2">{result.count_skills}</span>
+                  </p>
+                </div>
 
                 {/* Skills */}
-                <div className="flex flex-wrap gap-2">
-                  {result.present_skills.map((skill, idx) => (
-                    <span
-                      key={idx}
-                      className="px-3 py-1 bg-blue-600/20 border border-blue-500 text-blue-300 rounded-full text-sm"
-                    >
-                      {skill}
-                    </span>
-                  ))}
+                <div>
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">Matched Skills</h3>
+                  <div className="flex flex-wrap gap-3">
+                    {result.present_skills.map((skill, idx) => (
+                      <span
+                        key={idx}
+                        className="px-4 py-2 bg-primary/10 border-2 border-primary/30 text-primary rounded-xl text-sm font-medium hover:bg-primary/20 transition-colors cursor-default"
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
                 </div>
 
               </div>
