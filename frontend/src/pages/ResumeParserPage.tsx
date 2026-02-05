@@ -95,9 +95,10 @@ const ResumeUploadPage: React.FC = () => {
       const data = await response.json()
       setResult(data)
       toast.success(`Resume parsed successfully! Found ${data.count_skills} matching skills`);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Resume parsing error:', err);
-      toast.error(err.message || 'Failed to parse resume');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to parse resume';
+      toast.error(errorMessage);
       // Reset steps on error
       setProcessingSteps(prev => prev.map(step => ({ ...step, status: 'pending' as const })));
     } finally {
