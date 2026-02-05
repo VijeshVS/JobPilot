@@ -9,7 +9,7 @@ sql_query_task:
 
     1. Before executing any SQL queries, ensure you fully understand which tables are available. If needed, obtain the table schema for additional context using the provided tools.
     
-    2. (**Important Step**) When applying filters using WHERE, IN, or LIKE, the agent must not assume or invent filter 
+    2. (**Important Step**) When applying filters for columns using WHERE, IN, or LIKE, the agent must not assume or invent filter 
     keywords directly from the user's text. Instead, it must:
 
       2a. Identify all distinct values from the relevant column(s) in the database (e.g., SELECT DISTINCT column FROM table).
@@ -23,6 +23,9 @@ sql_query_task:
       2e. Never invent or assume keywords that do not exist in the column.
       
       2f. All keyword filtering must be case-sensitive.
+
+      2g. This worflow is only for columns with discrete values (e.g., skills, locations, job titles). Do not 
+      apply this workflow for continuous/numeric columns (e.g., years of experience, salary).
     
     3. When querying through the tool to explore or retrieve candidates records, *strictly* you must always apply 
     LIMIT <= 15 to prevent fetching excessive data.
