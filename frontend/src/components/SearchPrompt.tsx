@@ -28,7 +28,7 @@ export function SearchPrompt({ onSearch, isLoading }: SearchPromptProps) {
       category: "Tech Stack"
     },
     {
-      text: "Candidates with 3+ years of experience in cloud technologies",
+      text: "Candidates with 3+ years of experience in NoSQL technologies",
       category: "Experience"
     },
     {
